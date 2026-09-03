@@ -126,6 +126,22 @@
     let valid = true;
     let missingMeal = false;
     let missingName = false;
+    let missingAdult = false;
+    const attendingInputs = document.querySelectorAll('input[id^="attending-input-"]');
+    const anyChildAttending = Array.from(attendingInputs).some(input => {
+      const guestId = input.id.replace('attending-input-', '');
+      const block = document.getElementById('guest-' + guestId);
+      return input.value === 'yes' && block.querySelector('.child-tag');
+    });
+
+    if (anyChildAttending) {
+      const anyAdultAttending = Array.from(attendingInputs).some(input => {
+        const guestId = input.id.replace('attending-input-', '');
+        const block = document.getElementById('guest-' + guestId);
+        return input.value === 'yes' && !block.querySelector('.child-tag');
+      });
+      if (!anyAdultAttending) missingAdult = true;
+    }
 
     document.querySelectorAll('input[id^="attending-input-"]').forEach(function (input) {
       if (input.value === 'yes') {
@@ -140,11 +156,12 @@
         missingName = true;
       }
     });
-
-    if (missingMeal || missingName) {
+    if (missingMeal || missingName || missingAdult) {
       e.preventDefault();
       const banner = document.getElementById('validation-banner');
-      if (missingName && missingMeal) {
+      if (missingAdult) {
+        banner.textContent = 'We\'re not an adoption agency!';
+      } else if (missingName && missingMeal) {
         banner.textContent = 'Please enter your plus-one\'s name and select a meal for each attending guest.';
       } else if (missingName) {
         banner.textContent = 'Please enter your plus-one\'s name.';
