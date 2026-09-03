@@ -1,13 +1,15 @@
 import os
 import csv
 import io
+import random
+import json
+
 from datetime import datetime
 from functools import wraps
 
 from flask import (Flask, render_template, request, redirect,
                    url_for, session, flash, Response)
 from flask_sqlalchemy import SQLAlchemy
-import random
 from flask import jsonify
 
 MAPS_API_KEY = os.environ.get('GOOGLE_MAPS_API_KEY')
@@ -21,7 +23,7 @@ GUEST_PASSWORD = os.environ.get('GUEST_PASSWORD', 'changeme')
 ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD', 'adminchangeme')
 
 MEAL_OPTIONS_ADULT = ['Chicken', 'Fish', 'Vegetarian']
-MEAL_OPTIONS_CHILD = ['Chicken', 'Fish', 'Vegetarian', 'Kids meal']
+MEAL_OPTIONS_CHILD = ['Chicken', 'Fish', 'Vegetarian', 'None']
 
 db = SQLAlchemy(app)
 
@@ -30,7 +32,7 @@ db = SQLAlchemy(app)
 
 class Household(db.Model):
     id           = db.Column(db.Integer, primary_key=True)
-    name         = db.Column(db.String(200), nullable=False)   # "The Zhangs"
+    name         = db.Column(db.String(200), nullable=False)
     submitted_at = db.Column(db.DateTime, nullable=True)       # None = not yet responded
     guests       = db.relationship('Guest', backref='household',
                                    cascade='all, delete-orphan', lazy=True)
@@ -133,7 +135,7 @@ def rsvp():
     if request.method == 'POST':
         search = request.form.get('name', '').strip()
         if not search:
-            flash('Please enter your name.')
+            flash('Enter your name.')
             return render_template('rsvp.html')
 
         guest = Guest.query.filter(
@@ -173,7 +175,7 @@ def rsvp_form(hid):
 
             # +1 guests must be named if attending
             if guest.name.startswith('+') and attending_val == 'yes' and not new_name:
-                flash('Please enter a name for your plus-one.')
+                flash('Enter a name for your plus-one.')
                 return render_template('rsvp_form.html', household=household,
                                     meal_options_adult=MEAL_OPTIONS_ADULT,
                                     meal_options_child=MEAL_OPTIONS_CHILD)
@@ -188,7 +190,7 @@ def rsvp_form(hid):
                 options = MEAL_OPTIONS_CHILD if guest.is_child else MEAL_OPTIONS_ADULT
                 meal = request.form.get(f'meal_{guest.id}', '').strip()
                 if meal not in options:
-                    flash(f'Please select a meal for {guest.name}.')
+                    flash(f'Select a meal for {guest.name}.')
                     return render_template('rsvp_form.html', household=household,
                                            meal_options_adult=MEAL_OPTIONS_ADULT,
                                            meal_options_child=MEAL_OPTIONS_CHILD)
@@ -218,7 +220,30 @@ def rsvp_confirm(hid):
 @app.route('/admin')
 @admin_required
 def admin():
-    households = Household.query.order_by(Household.name).all()
+    sort = request.args.get('sort', 'alpha')  # default to alphabetical
+
+    if sort == 'responded':
+        households = Household.query.order_by(
+            Household.submitted_at.desc().nullslast(),
+            Household.name
+        ).all()
+    elif sort == 'pending':
+        households = Household.query.order_by(
+            Household.submitted_at.nullsfirst(),
+            Household.name
+        ).all()
+    else:
+        households = Household.query.order_by(Household.name).all()
+
+    households_json = json.dumps({
+        str(h.id): {
+            'id': h.id,
+            'name': h.name,
+            'submitted': h.submitted,
+            'submittedAt': h.submitted_at.strftime('%b %d') if h.submitted_at else None,
+        }
+        for h in households
+    })
 
     total_guests  = Guest.query.count()
     total_attend  = Guest.query.filter_by(attending=True).count()
@@ -231,7 +256,9 @@ def admin():
         meal_counts[key] = meal_counts.get(key, 0) + 1
 
     return render_template('admin.html',
+                           sort=sort,
                            households=households,
+                           households_json=households_json,
                            total_guests=total_guests,
                            total_attend=total_attend,
                            total_decline=total_decline,

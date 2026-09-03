@@ -63,7 +63,15 @@
     <button class="btn btn-green" style="font-size:0.7rem; padding:0.5rem 1rem;" onclick="toggleForm()">+ Add
       household</button>
   </div>
-
+  <div
+    style="display:flex; justify-content:space-between; align-items:baseline; flex-wrap:wrap; gap:1rem; margin-top:2rem;">
+    <div style="display:flex; gap:0.5rem; align-items:center;">
+      <span style="font-size:0.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.07em;">Sort:</span>
+      <button class="sort-btn active" id="sort-alpha" onclick="sortHouseholds('alpha', this)">A–Z</button>
+      <button class="sort-btn" id="sort-responded" onclick="sortHouseholds('responded', this)">Responded first</button>
+      <button class="sort-btn" id="sort-pending" onclick="sortHouseholds('pending', this)">Pending first</button>
+    </div>
+  </div>
   <!-- Add household form (hidden by default) -->
   <div id="add-household-form" style="display:none; background:var(--surface); padding:2rem; margin:1rem 0 2rem;">
     <form method="post" action="{{ url_for('add_household') }}">
@@ -109,198 +117,250 @@
   <!-- Households -->
   {% if households %}
   <div style="margin-top:1rem;">
-    {% for h in households %}
-    <div class="household-block">
-      <div class="household-header">
-        <div style="display:flex;align-items:center;gap:0.75rem;flex-wrap:wrap;">
-          <span class="household-name" id="hname-{{ h.id }}">{{ h.name }}</span>
-          {% if h.submitted %}<span class="badge badge-yes">Responded</span>{% else %}<span class="badge"
-            style="background:var(--surface);color:var(--muted);">Pending</span>{% endif %}
-          {% if h.submitted_at %}<span style="color:var(--muted);font-size:0.75rem;">{{ h.submitted_at.strftime('%b %d')
-            }}</span>{% endif %}
-          <button type="button" class="btn-text-edit" onclick="toggleHEdit({{ h.id }})">Edit name</button>
-          <form id="hedit-{{ h.id }}" style="display:none;" method="post"
-            action="{{ url_for('edit_household', hid=h.id) }}" class="inline-edit-form">
-            <input type="text" name="name" value="{{ h.name }}" style="width:200px;">
-            <button type="submit" class="btn btn-green" style="font-size:0.65rem;padding:0.4rem 0.8rem;">Save</button>
-            <button type="button" onclick="toggleHEdit({{ h.id }})" class="btn"
-              style="background:var(--border);color:var(--text);font-size:0.65rem;padding:0.4rem 0.8rem;">Cancel</button>
+    <div id="households-container">
+      {% for h in households %}
+
+      <div class="household-block" id="household-block-{{ h.id }}">
+        <div class="household-header">
+          <div style="display:flex;align-items:center;gap:0.75rem;flex-wrap:wrap;">
+            <span class="household-name" id="hname-{{ h.id }}">{{ h.name }}</span>
+            {% if h.submitted %}<span class="badge badge-yes">Responded</span>{% else %}<span class="badge"
+              style="background:var(--surface);color:var(--muted);">Pending</span>{% endif %}
+            {% if h.submitted_at %}<span style="color:var(--muted);font-size:0.75rem;">{{ h.submitted_at.strftime('%b
+              %d')
+              }}</span>{% endif %}
+            <button type="button" class="btn-text-edit" onclick="toggleHEdit({{ h.id }})">Edit name</button>
+            <form id="hedit-{{ h.id }}" style="display:none;" method="post"
+              action="{{ url_for('edit_household', hid=h.id) }}" class="inline-edit-form">
+              <input type="text" name="name" value="{{ h.name }}" style="width:200px;">
+              <button type="submit" class="btn btn-green" style="font-size:0.65rem;padding:0.4rem 0.8rem;">Save</button>
+              <button type="button" onclick="toggleHEdit({{ h.id }})" class="btn"
+                style="background:var(--border);color:var(--text);font-size:0.65rem;padding:0.4rem 0.8rem;">Cancel</button>
+            </form>
+          </div>
+          <form method="post" action="{{ url_for('delete_household', hid=h.id) }}"
+            onsubmit="return confirm('Delete {{ h.name }} and all their guests?')">
+            <button type="submit" class="btn-text-danger">Delete</button>
           </form>
         </div>
-        <form method="post" action="{{ url_for('delete_household', hid=h.id) }}"
-          onsubmit="return confirm('Delete {{ h.name }} and all their guests?')">
-          <button type="submit" class="btn-text-danger">Delete</button>
+
+        <table style="margin-top:0.75rem;">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Type</th>
+              <th>Attending</th>
+              <th>Meal</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for g in h.guests %}
+            <tr>
+              <td>
+                <span id="gname-{{ g.id }}">{{ g.name }}</span>
+                <button type="button" class="btn-text-edit" onclick="toggleGEdit({{ g.id }})">Edit</button>
+                <form id="gedit-{{ g.id }}" style="display:none;" method="post"
+                  action="{{ url_for('edit_guest', gid=g.id) }}" class="inline-edit-form">
+                  <input type="text" name="name" value="{{ g.name }}" style="width:150px;">
+                  <label
+                    style="display:flex;align-items:center;gap:0.4rem;font-size:0.85rem;text-transform:none;letter-spacing:0;">
+                    <input type="checkbox" name="is_child" {% if g.is_child %}checked{% endif %}> Child
+                  </label>
+                  <button type="submit" class="btn btn-green"
+                    style="font-size:0.65rem;padding:0.4rem 0.8rem;">Save</button>
+                  <button type="button" onclick="toggleGEdit({{ g.id }})" class="btn"
+                    style="background:var(--border);color:var(--text);font-size:0.65rem;padding:0.4rem 0.8rem;">Cancel</button>
+                </form>
+              </td>
+              <td style="color:var(--muted);">{{ 'Child' if g.is_child else 'Adult' }}</td>
+              <td>
+                {% if g.attending == True %}<span class="badge badge-yes">Yes</span>
+                {% elif g.attending == False %}<span class="badge badge-no">No</span>
+                {% else %}<span style="color:var(--muted);font-size:0.8rem;">-</span>{% endif %}
+              </td>
+              <td>{{ g.meal_choice or '-' }}</td>
+              <td>
+                <form method="post" action="{{ url_for('delete_guest', gid=g.id) }}">
+                  <button type="submit" class="btn-text-danger">✕</button>
+                </form>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+
+        <!-- Add guest to existing household -->
+        <form method="post" action="{{ url_for('add_guest', hid=h.id) }}" class="add-guest-inline">
+          <input type="text" name="guest_name" placeholder="Add another guest…" style="width:220px;">
+          <label
+            style="display:flex;align-items:center;gap:0.4rem;text-transform:none;letter-spacing:0;font-size:0.85rem;">
+            <input type="checkbox" name="is_child"> Child
+          </label>
+          <button type="submit" class="btn btn-green" style="font-size:0.65rem;padding:0.45rem 0.9rem;">Add</button>
         </form>
       </div>
-
-      <table style="margin-top:0.75rem;">
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Type</th>
-            <th>Attending</th>
-            <th>Meal</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for g in h.guests %}
-          <tr>
-            <td>
-              <span id="gname-{{ g.id }}">{{ g.name }}</span>
-              <button type="button" class="btn-text-edit" onclick="toggleGEdit({{ g.id }})">Edit</button>
-              <form id="gedit-{{ g.id }}" style="display:none;" method="post"
-                action="{{ url_for('edit_guest', gid=g.id) }}" class="inline-edit-form">
-                <input type="text" name="name" value="{{ g.name }}" style="width:150px;">
-                <label
-                  style="display:flex;align-items:center;gap:0.4rem;font-size:0.85rem;text-transform:none;letter-spacing:0;">
-                  <input type="checkbox" name="is_child" {% if g.is_child %}checked{% endif %}> Child
-                </label>
-                <button type="submit" class="btn btn-green"
-                  style="font-size:0.65rem;padding:0.4rem 0.8rem;">Save</button>
-                <button type="button" onclick="toggleGEdit({{ g.id }})" class="btn"
-                  style="background:var(--border);color:var(--text);font-size:0.65rem;padding:0.4rem 0.8rem;">Cancel</button>
-              </form>
-            </td>
-            <td style="color:var(--muted);">{{ 'Child' if g.is_child else 'Adult' }}</td>
-            <td>
-              {% if g.attending == True %}<span class="badge badge-yes">Yes</span>
-              {% elif g.attending == False %}<span class="badge badge-no">No</span>
-              {% else %}<span style="color:var(--muted);font-size:0.8rem;">-</span>{% endif %}
-            </td>
-            <td>{{ g.meal_choice or '-' }}</td>
-            <td>
-              <form method="post" action="{{ url_for('delete_guest', gid=g.id) }}">
-                <button type="submit" class="btn-text-danger">✕</button>
-              </form>
-            </td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-
-      <!-- Add guest to existing household -->
-      <form method="post" action="{{ url_for('add_guest', hid=h.id) }}" class="add-guest-inline">
-        <input type="text" name="guest_name" placeholder="Add another guest…" style="width:220px;">
-        <label
-          style="display:flex;align-items:center;gap:0.4rem;text-transform:none;letter-spacing:0;font-size:0.85rem;">
-          <input type="checkbox" name="is_child"> Child
-        </label>
-        <button type="submit" class="btn btn-green" style="font-size:0.65rem;padding:0.45rem 0.9rem;">Add</button>
-      </form>
+      {% endfor %}
     </div>
-    {% endfor %}
+    {% else %}
+    <p style="color:var(--muted);margin-top:1rem;">No households yet - add one above.</p>
+    {% endif %}
+
   </div>
-  {% else %}
-  <p style="color:var(--muted);margin-top:1rem;">No households yet - add one above.</p>
-  {% endif %}
 
-</div>
+  <style>
+    .household-block {
+      border: 1px solid var(--border);
+      padding: 1.5rem;
+      margin-bottom: 1.25rem;
+    }
 
-<style>
-  .household-block {
-    border: 1px solid var(--border);
-    padding: 1.5rem;
-    margin-bottom: 1.25rem;
-  }
+    .household-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
 
-  .household-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-  }
+    .household-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.2rem;
+      font-weight: 400;
+      color: var(--green);
+    }
 
-  .household-name {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 1.2rem;
-    font-weight: 400;
-    color: var(--green);
-  }
+    .btn-text-danger {
+      background: none;
+      border: none;
+      color: var(--muted);
+      font-size: 0.75rem;
+      cursor: pointer;
+      padding: 0.2rem 0.4rem;
+      transition: color 0.15s;
+    }
 
-  .btn-text-danger {
-    background: none;
-    border: none;
-    color: var(--muted);
-    font-size: 0.75rem;
-    cursor: pointer;
-    padding: 0.2rem 0.4rem;
-    transition: color 0.15s;
-  }
+    .btn-text-danger:hover {
+      color: var(--rose);
+    }
 
-  .btn-text-danger:hover {
-    color: var(--rose);
-  }
+    .guest-field-row {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 0.6rem;
+    }
 
-  .guest-field-row {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    margin-bottom: 0.6rem;
-  }
+    .add-guest-inline {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border);
+      flex-wrap: wrap;
+    }
 
-  .add-guest-inline {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    margin-top: 1rem;
-    padding-top: 1rem;
-    border-top: 1px solid var(--border);
-    flex-wrap: wrap;
-  }
+    .btn-text-edit {
+      background: none;
+      border: none;
+      color: var(--muted);
+      font-size: 0.72rem;
+      cursor: pointer;
+      padding: 0.1rem 0.3rem;
+      text-decoration: underline;
+      transition: color 0.15s;
+    }
 
-  .btn-text-edit {
-    background: none;
-    border: none;
-    color: var(--muted);
-    font-size: 0.72rem;
-    cursor: pointer;
-    padding: 0.1rem 0.3rem;
-    text-decoration: underline;
-    transition: color 0.15s;
-  }
+    .btn-text-edit:hover {
+      color: var(--green);
+    }
 
-  .btn-text-edit:hover {
-    color: var(--green);
-  }
+    .inline-edit-form {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      margin-top: 0.4rem;
+    }
 
-  .inline-edit-form {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    flex-wrap: wrap;
-    margin-top: 0.4rem;
-  }
-</style>
+    .sort-btn {
+      font-size: 0.7rem;
+      padding: 0.35rem 0.75rem;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      text-decoration: none;
+      transition: all 0.15s;
+    }
 
-<script>
-  let guestRowCount = 3;
+    .sort-btn:hover {
+      border-color: var(--green);
+      color: var(--green);
+    }
 
-  function toggleForm() {
-    const f = document.getElementById('add-household-form');
-    f.style.display = f.style.display === 'none' ? 'block' : 'none';
-  }
-  function addGuestRow() {
-    guestRowCount++;
-    const container = document.getElementById('guest-fields');
-    const row = document.createElement('div');
-    row.className = 'guest-field-row';
-    row.innerHTML = `
+    .sort-btn.active {
+      background: var(--green);
+      color: #fff;
+      border-color: var(--green);
+    }
+  </style>
+
+  <script>
+    let guestRowCount = 3;
+
+    function toggleForm() {
+      const f = document.getElementById('add-household-form');
+      f.style.display = f.style.display === 'none' ? 'block' : 'none';
+    }
+    function addGuestRow() {
+      guestRowCount++;
+      const container = document.getElementById('guest-fields');
+      const row = document.createElement('div');
+      row.className = 'guest-field-row';
+      row.innerHTML = `
       <input type="text" name="guest_name_${guestRowCount}" placeholder="Full name" style="flex:1;">
       <label style="display:flex;align-items:center;gap:0.4rem;text-transform:none;letter-spacing:0;font-size:0.85rem;white-space:nowrap;">
         <input type="checkbox" name="guest_child_${guestRowCount}"> Child
       </label>`;
-    container.appendChild(row);
-  }
-  function toggleGEdit(id) {
-    const form = document.getElementById('gedit-' + id);
-    form.style.display = form.style.display === 'none' ? 'flex' : 'none';
-  }
-  function toggleHEdit(id) {
-    const form = document.getElementById('hedit-' + id);
-    form.style.display = form.style.display === 'none' ? 'flex' : 'none';
-  }
-</script>
+      container.appendChild(row);
+    }
+    function toggleGEdit(id) {
+      const form = document.getElementById('gedit-' + id);
+      form.style.display = form.style.display === 'none' ? 'flex' : 'none';
+    }
+    function toggleHEdit(id) {
+      const form = document.getElementById('hedit-' + id);
+      form.style.display = form.style.display === 'none' ? 'flex' : 'none';
+    }
+    function sortHouseholds(mode, btn) {
+      const householdData = JSON.parse('{{ households_json | safe }}');
+      // Update active button
+      document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
 
-{% endblock %}
+      const ids = Object.keys(householdData).map(Number);
+
+      ids.sort((a, b) => {
+        const ha = householdData[a];
+        const hb = householdData[b];
+        if (mode === 'alpha') {
+          return ha.name.localeCompare(hb.name);
+        } else if (mode === 'responded') {
+          if (ha.submitted && !hb.submitted) return -1;
+          if (!ha.submitted && hb.submitted) return 1;
+          return ha.name.localeCompare(hb.name);
+        } else if (mode === 'pending') {
+          if (!ha.submitted && hb.submitted) return -1;
+          if (ha.submitted && !hb.submitted) return 1;
+          return ha.name.localeCompare(hb.name);
+        }
+      });
+
+      const container = document.getElementById('households-container');
+      ids.forEach(id => {
+        const block = document.getElementById('household-block-' + id);
+        if (block) container.appendChild(block);
+      });
+    }
+  </script>
+  {% endblock %}
