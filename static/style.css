@@ -24,39 +24,58 @@ body {
 
 /* ── Navigation ── */
 nav {
-  padding: 1.5rem 2.5rem;
+  padding: 1rem 1.5rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
   border-bottom: 1px solid var(--border);
+  gap: 1rem;
+  flex-wrap: nowrap;
 }
 
 .nav-brand {
   font-family: 'Cormorant Garamond', serif;
   font-weight: 400;
-  font-size: 1.2rem;
+  font-size: 1.1rem;
   color: var(--green);
   text-decoration: none;
   letter-spacing: 0.03em;
+  white-space: nowrap;
 }
 
 .nav-links {
   display: flex;
-  gap: 2rem;
+  gap: 1rem;
   list-style: none;
+  flex-wrap: nowrap;
+  align-items: center;
 }
 
 .nav-links a {
-  font-size: 0.72rem;
+  font-size: 0.65rem;
   font-weight: 400;
-  letter-spacing: 0.09em;
+  letter-spacing: 0.07em;
   text-transform: uppercase;
   color: var(--muted);
   text-decoration: none;
   transition: color 0.2s;
+  white-space: nowrap;
 }
 
 .nav-links a:hover { color: var(--green); }
+
+@media (max-width: 480px) {
+  .nav-brand {
+    font-size: 0.95rem;
+  }
+  .nav-links {
+    gap: 0.6rem;
+  }
+  .nav-links a {
+    font-size: 0.58rem;
+    letter-spacing: 0.04em;
+  }
+}
 
 /* ── Hero ── */
 .hero {
