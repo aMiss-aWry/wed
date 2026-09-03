@@ -105,10 +105,10 @@ def logout():
 @app.route('/')
 @login_required
 def index():
-    image_dir = os.path.join(app.static_folder, 'images', 'WeddingSite')
+    image_dir = os.path.join(app.static_folder, 'images', 'sitepics')
     try:
         images = [
-            f"images/WeddingSite/{f}"
+            f"images/sitepics/{f}"
             for f in os.listdir(image_dir)
             if f.lower().endswith(('.jpg', '.jpeg', '.png', '.webp'))
         ]
