@@ -124,25 +124,33 @@
 <script>
   document.getElementById('rsvp-form').addEventListener('submit', function (e) {
     let valid = true;
+    let missingMeal = false;
+    let missingName = false;
 
     document.querySelectorAll('.meal-row').forEach(function (row) {
       if (row.style.display === 'none') return;
       const select = row.querySelector('select');
       if (!select || select.selectedIndex <= 0) {
-        valid = false;
+        missingMeal = true;
       }
     });
 
     document.querySelectorAll('input[id^="name_"]').forEach(function (input) {
       if (input.required && !input.value.trim()) {
-        valid = false;
+        missingName = true;
       }
     });
 
-    if (!valid) {
+    if (missingMeal || missingName) {
       e.preventDefault();
       const banner = document.getElementById('validation-banner');
-      banner.textContent = 'Please select a meal for each attending guest.';
+      if (missingName && missingMeal) {
+        banner.textContent = 'Please enter your plus-one\'s name and select a meal for each attending guest.';
+      } else if (missingName) {
+        banner.textContent = 'Please enter your plus-one\'s name.';
+      } else {
+        banner.textContent = 'Please select a meal for each attending guest.';
+      }
       banner.style.display = 'block';
       banner.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
