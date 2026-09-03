@@ -1,5 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Inter:wght@300;400;500&display=swap');
-
+@import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,400;0,500;1,400&family=Spectral:wght@300;400;700&display=swap');
 :root {
   --bg:         #F6F3ED;
   --surface:    #EDEAE2;
@@ -14,7 +13,7 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
-  font-family: 'Inter', sans-serif;
+  font-family: 'Spectral', sans-serif;
   font-weight: 300;
   background: var(--bg);
   color: var(--text);
@@ -34,7 +33,7 @@ nav {
 }
 
 .nav-brand {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: 'Spectral', serif;
   font-weight: 400;
   font-size: 1.1rem;
   color: var(--green);
@@ -84,7 +83,7 @@ nav {
 }
 
 .hero-names {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: 'Spectral', serif;
   font-weight: 300;
   font-size: clamp(2.5rem, 7vw, 4.5rem);
   line-height: 1.05;
@@ -113,7 +112,7 @@ nav {
 .hero-divider-icon { font-size: 0.45rem; }
 
 .hero-date {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: 'Spectral', serif;
   font-style: italic;
   font-size: 1.5rem;
   color: var(--muted);
@@ -138,7 +137,7 @@ nav {
 .section { margin-bottom: 4.5rem; }
 
 .section-title {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: 'Spectral', serif;
   font-weight: 400;
   font-size: 2rem;
   color: var(--green);
@@ -195,7 +194,7 @@ nav {
 .schedule-item:first-child { border-top: 1px solid var(--border); }
 
 .schedule-time {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: 'Spectral', serif;
   font-style: italic;
   font-size: 1.05rem;
   color: var(--rose);
@@ -214,7 +213,7 @@ nav {
 }
 
 .rsvp-cta-title {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: 'Spectral', serif;
   font-weight: 300;
   font-size: 2.25rem;
   color: #fff;
@@ -232,7 +231,7 @@ nav {
 .btn {
   display: inline-block;
   padding: 0.8rem 2.25rem;
-  font-family: 'Inter', sans-serif;
+  font-family: 'Crimson Pro', sans-serif;
   font-size: 0.72rem;
   font-weight: 500;
   letter-spacing: 0.09em;
@@ -272,7 +271,7 @@ nav {
 }
 
 .form-title {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: 'Spectral', serif;
   font-size: 2.75rem;
   font-weight: 300;
   color: var(--green);
@@ -306,7 +305,7 @@ select {
   padding: 0.7rem 0.75rem;
   background: #fff;
   border: 1px solid var(--border);
-  font-family: 'Inter', sans-serif;
+  font-family: 'Crimson Pro', sans-serif;
   font-size: 1rem;
   font-weight: 300;
   color: var(--text);
@@ -329,7 +328,7 @@ textarea { resize: vertical; min-height: 80px; }
 
 .attend-btn {
   padding: 0.5rem 1.1rem;
-  font-family: 'Inter', sans-serif;
+  font-family: 'Crimson Pro', sans-serif;
   font-size: 0.75rem;
   font-weight: 400;
   letter-spacing: 0.06em;
@@ -387,7 +386,7 @@ textarea { resize: vertical; min-height: 80px; }
 }
 
 .login-names {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: 'Spectral', serif;
   font-size: 3.25rem;
   font-weight: 300;
   color: var(--green);
@@ -433,7 +432,7 @@ textarea { resize: vertical; min-height: 80px; }
 .confirm-inner { max-width: 420px; }
 
 .confirm-mark {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: 'Spectral', serif;
   font-size: 4rem;
   color: var(--green);
   line-height: 1;
@@ -441,7 +440,7 @@ textarea { resize: vertical; min-height: 80px; }
 }
 
 .confirm-title {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: 'Spectral', serif;
   font-size: 2.25rem;
   font-weight: 300;
   color: var(--green);
@@ -472,7 +471,7 @@ textarea { resize: vertical; min-height: 80px; }
 }
 
 .admin-title {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: 'Spectral', serif;
   font-size: 2rem;
   font-weight: 400;
   color: var(--green);
@@ -493,7 +492,7 @@ textarea { resize: vertical; min-height: 80px; }
 }
 
 .stat-number {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: 'Spectral', serif;
   font-size: 3rem;
   font-weight: 300;
   color: var(--green);
