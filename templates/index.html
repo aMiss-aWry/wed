@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+
+{% block title %}Max & Wendy — Welcome{% endblock %}
+
+{% block content %}
+
+<!-- Hero -->
+<section class="hero">
+  <h1 class="hero-names">Max<br>&amp; Wendy</h1>
+  <div class="hero-divider">
+    <span class="hero-divider-icon">◆</span>
+  </div>
+  {# Update the date and location below #}
+  <p class="hero-date">June 14, 2027</p>
+  <p class="hero-location">Tucson, Arizona</p>
+</section>
+
+<div class="content">
+
+  <!-- Photos -->
+  <section class="section">
+    <div class="photo-grid">
+      {#
+        To add photos, put image files in static/images/ and replace
+        the photo-placeholder divs with img tags like:
+        <img src="{{ url_for('static', filename='images/photo1.jpg') }}" alt="">
+      #}
+      <div class="photo-placeholder">photo</div>
+      <div class="photo-placeholder">photo</div>
+      <div class="photo-placeholder">photo</div>
+      <div class="photo-placeholder">photo</div>
+    </div>
+  </section>
+
+  <!-- Our Story -->
+  <section class="section">
+    <h2 class="section-title">Our Story</h2>
+    <p>
+      {# Replace this with your actual story #}
+      We met in [year] when [how you met]. Since then we've [a few highlights
+      — travels, shared adventures, what makes your story yours].
+    </p>
+    <p>
+      After [however long], we're finally making it official — and we couldn't
+      be happier to celebrate with the people we love most.
+    </p>
+  </section>
+
+  <!-- Schedule -->
+  <section class="section" id="schedule">
+    <h2 class="section-title">The Day</h2>
+    <div class="schedule-list">
+
+      <div class="schedule-item">
+        <span class="schedule-time">4:00 pm</span>
+        <div>
+          <div class="schedule-event">Ceremony</div>
+          <div class="schedule-detail">[Venue name], [Address]</div>
+        </div>
+      </div>
+
+      <div class="schedule-item">
+        <span class="schedule-time">4:30 pm</span>
+        <div>
+          <div class="schedule-event">Cocktail Hour</div>
+          <div class="schedule-detail">Drinks and mingling on the [patio / lawn / etc.]</div>
+        </div>
+      </div>
+
+      <div class="schedule-item">
+        <span class="schedule-time">6:00 pm</span>
+        <div>
+          <div class="schedule-event">Dinner & Dancing</div>
+          <div class="schedule-detail">
+            We'll eat, toast, and celebrate well into the evening.
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Travel -->
+  <section class="section" id="travel">
+    <h2 class="section-title">Getting There</h2>
+    <p>
+      The closest airport is <strong>[Airport name and code]</strong>, about
+      [X] minutes from the venue. We recommend arriving the day before if you
+      can — [city] is worth a little extra time.
+    </p>
+    <p>
+      <strong>Hotel block:</strong> We've reserved a room block at the
+      [Hotel Name] at a discounted rate. Use code <strong>[CODE]</strong>
+      when booking, or call [phone]. The block closes [date].
+    </p>
+    <p>
+      <strong>Parking:</strong> [Venue name] has free on-site parking.
+      Rideshares and taxis are also plentiful.
+    </p>
+  </section>
+
+</div>
+
+<!-- RSVP CTA -->
+<section class="rsvp-cta">
+  <h2 class="rsvp-cta-title">Will you join us?</h2>
+  <p>Please RSVP by [date — e.g. May 1, 2027] so we can plan accordingly.</p>
+  <a href="{{ url_for('rsvp') }}" class="btn btn-light">RSVP now</a>
+</section>
+
+{% endblock %}

@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+
+{% block title %}RSVP — {{ household.name }}{% endblock %}
+
+{% block content %}
+
+<div class="form-page" style="max-width:560px;">
+  <h1 class="form-title">{{ household.name }}</h1>
+  <p class="form-subtitle">
+    Let us know who can make it, and choose a meal for each guest attending.
+    {% if household.submitted %}
+    <strong>You've already submitted — submitting again will update your response.</strong>
+    {% endif %}
+  </p>
+
+  {% with messages = get_flashed_messages() %}
+    {% if messages %}
+      {% for msg in messages %}<div class="flash">{{ msg }}</div>{% endfor %}
+    {% endif %}
+  {% endwith %}
+
+  <form method="post" action="{{ url_for('rsvp_form', hid=household.id) }}">
+
+    {% for guest in household.guests %}
+    <div class="guest-block" id="guest-{{ guest.id }}">
+
+      <div class="guest-header">
+        <span class="guest-name">
+          {{ guest.name }}
+          {% if guest.is_child %}<span class="child-tag">child</span>{% endif %}
+        </span>
+        <div class="radio-group">
+          <label class="radio-option">
+            <input type="radio" name="attending_{{ guest.id }}" value="yes"
+                   {% if guest.attending == True %}checked{% endif %}
+                   onchange="toggleMeal({{ guest.id }}, true)">
+            Attending
+          </label>
+          <label class="radio-option">
+            <input type="radio" name="attending_{{ guest.id }}" value="no"
+                   {% if guest.attending == False %}checked{% endif %}
+                   onchange="toggleMeal({{ guest.id }}, false)">
+            Not attending
+          </label>
+        </div>
+      </div>
+
+      <div class="meal-row" id="meal-{{ guest.id }}"
+           style="display:{% if guest.attending %}block{% else %}none{% endif %};">
+        <label for="meal_{{ guest.id }}">Meal preference</label>
+        <select id="meal_{{ guest.id }}" name="meal_{{ guest.id }}">
+          <option value="" disabled {% if not guest.meal_choice %}selected{% endif %}>Select one</option>
+          {% if guest.is_child %}
+            {% for m in meal_options_child %}
+            <option value="{{ m }}" {% if guest.meal_choice == m %}selected{% endif %}>{{ m }}</option>
+            {% endfor %}
+          {% else %}
+            {% for m in meal_options_adult %}
+            <option value="{{ m }}" {% if guest.meal_choice == m %}selected{% endif %}>{{ m }}</option>
+            {% endfor %}
+          {% endif %}
+        </select>
+      </div>
+
+    </div>
+    {% endfor %}
+
+    <button type="submit" class="btn btn-green" style="margin-top:1.5rem;">
+      Submit RSVP
+    </button>
+
+  </form>
+</div>
+
+<style>
+  .guest-block {
+    border-bottom: 1px solid var(--border);
+    padding: 1.5rem 0;
+  }
+  .guest-block:first-of-type { border-top: 1px solid var(--border); }
+
+  .guest-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-bottom: 0;
+  }
+
+  .guest-name {
+    font-weight: 400;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .child-tag {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--muted);
+    background: var(--surface);
+    padding: 0.15rem 0.4rem;
+  }
+
+  .meal-row {
+    margin-top: 1rem;
+    padding-left: 0;
+  }
+
+  .meal-row label {
+    color: var(--muted);
+    font-size: 0.7rem;
+  }
+</style>
+
+<script>
+  function toggleMeal(guestId, show) {
+    const row = document.getElementById('meal-' + guestId);
+    const select = document.getElementById('meal_' + guestId);
+    row.style.display = show ? 'block' : 'none';
+    select.required = show;
+    if (!show) select.value = '';
+  }
+</script>
+
+{% endblock %}

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Max & Wendy</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<div class="login-page">
+  <div class="login-card">
+
+    <div class="login-names">Max<br>&amp; Wendy</div>
+
+    <div class="login-divider">
+      <span class="hero-divider-icon">◆</span>
+    </div>
+
+    {# Update this line with your actual date and location #}
+    <p class="login-detail">June 14, 2027 &middot; Tucson, Arizona</p>
+
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        {% for msg in messages %}
+          <div class="flash">{{ msg }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <form method="post" action="{{ url_for('login') }}">
+      <div class="field">
+        <label for="password">Enter the password to continue</label>
+        <input type="password" id="password" name="password"
+               autocomplete="current-password" autofocus>
+      </div>
+      <button type="submit" class="btn btn-green" style="width:100%;">
+        Enter
+      </button>
+    </form>
+
+  </div>
+</div>
+
+</body>
+</html>
