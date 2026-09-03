@@ -1,5 +1,3 @@
-<!-- src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDUctIO_LzPUGcOQP37JC92b1RX869zsz0&loading=async&libraries=place&callback=initMap" -->
-
 {% extends "base.html" %}
 
 {% block title %}Details — Max & Wendy{% endblock %}
@@ -26,7 +24,7 @@
             "></div>
         </div>
         <script async
-            src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDUctIO_LzPUGcOQP37JC92b1RX869zsz0&loading=async&callback=initMap"></script>
+            src="https://maps.googleapis.com/maps/api/js?key={{ maps_api_key }}&loading=async&callback=initMap"></script>
         </script>
         <script>
             let map;

@@ -10,8 +10,7 @@ from flask_sqlalchemy import SQLAlchemy
 import random
 from flask import jsonify
 
-DRIVE_API_KEY = os.environ.get('GOOGLE_DRIVE_API_KEY')
-DRIVE_FOLDER_ID = os.environ.get('GOOGLE_DRIVE_FOLDER_ID')
+MAPS_API_KEY = os.environ.get('GOOGLE_MAPS_API_KEY')
 
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'dev-secret-change-me')
@@ -126,7 +125,7 @@ def schedule():
 @app.route('/details')
 @login_required
 def details():
-    return render_template('details.html')
+    return render_template('details.html', maps_api_key=MAPS_API_KEY)
 
 @app.route('/rsvp', methods=['GET', 'POST'])
 @login_required
