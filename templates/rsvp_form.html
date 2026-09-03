@@ -32,17 +32,17 @@
           </div>
         </span>
         {% endif %}
-        <div class="radio-group">
-          <label class="radio-option">
-            <input type="radio" name="attending_{{ guest.id }}" value="yes" {% if guest.attending==True %}checked{%
-              endif %} onchange="toggleMeal({{ guest.id }}, true)">
+        <div class="attend-btns">
+          <button type="button" class="attend-btn {% if guest.attending == True %}active-yes{% endif %}"
+            id="yes-{{ guest.id }}" onclick="setAttending({{ guest.id }}, true)">
             Attending
-          </label>
-          <label class="radio-option">
-            <input type="radio" name="attending_{{ guest.id }}" value="no" {% if guest.attending==False %}checked{%
-              endif %} onchange="toggleMeal({{ guest.id }}, false)">
+          </button>
+          <button type="button" class="attend-btn {% if guest.attending == False %}active-no{% endif %}"
+            id="no-{{ guest.id }}" onclick="setAttending({{ guest.id }}, false)">
             Not attending
-          </label>
+          </button>
+          <input type="hidden" name="attending_{{ guest.id }}" id="attending-input-{{ guest.id }}"
+            value="{% if guest.attending == True %}yes{% elif guest.attending == False %}no{% endif %}">
         </div>
       </div>
 
@@ -95,8 +95,8 @@
   .guest-name {
     font-weight: 400;
     font-size: 1rem;
+    align-items: center;
     display: flex;
-    vertical-align: top;
     gap: 0.5rem;
   }
 
@@ -127,11 +127,11 @@
     let missingMeal = false;
     let missingName = false;
 
-    document.querySelectorAll('.meal-row').forEach(function (row) {
-      if (row.style.display === 'none') return;
-      const select = row.querySelector('select');
-      if (!select || select.selectedIndex <= 0) {
-        missingMeal = true;
+    document.querySelectorAll('input[id^="attending-input-"]').forEach(function (input) {
+      if (input.value === 'yes') {
+        const guestId = input.id.replace('attending-input-', '');
+        const select = document.getElementById('meal_' + guestId);
+        if (!select || select.selectedIndex <= 0) missingMeal = true;
       }
     });
 
@@ -155,19 +155,25 @@
       banner.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
   });
-  function toggleMeal(guestId, show) {
-    const row = document.getElementById('meal-' + guestId);
+
+  function setAttending(guestId, attending) {
+    const yesBtn = document.getElementById('yes-' + guestId);
+    const noBtn = document.getElementById('no-' + guestId);
+    const input = document.getElementById('attending-input-' + guestId);
+    const mealRow = document.getElementById('meal-' + guestId);
     const select = document.getElementById('meal_' + guestId);
     const nameInput = document.getElementById('name_' + guestId);
 
-    row.style.display = show ? 'block' : 'none';
-    select.required = show;
-    if (!show) select.value = '';
+    yesBtn.classList.toggle('active-yes', attending);
+    noBtn.classList.toggle('active-no', !attending);
 
-    // If this is a +1 guest, name is required only when attending
-    if (nameInput) {
-      nameInput.required = show;
-    }
+    input.value = attending ? 'yes' : 'no';
+
+    mealRow.style.display = attending ? 'block' : 'none';
+    select.required = attending;
+    if (!attending) select.value = '';
+
+    if (nameInput) nameInput.required = attending;
   }
 </script>
 
