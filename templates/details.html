@@ -23,9 +23,6 @@
                 );
             "></div>
         </div>
-        <script async
-            src="https://maps.googleapis.com/maps/api/js?key={{ maps_api_key }}&loading=async&callback=initMap"></script>
-        </script>
         <script>
             let map;
 
@@ -130,6 +127,10 @@
             };
             window.initMap = initMap;
         </script>
+
+        <script async
+            src="https://maps.googleapis.com/maps/api/js?key={{ maps_api_key }}&loading=async&callback=initMap"></script>
+        </script>
         <h2 class="section-title">Getting There</h2>
         <p>
             The closest airport is <strong>#TODO: Airport name and code</strong>, about
@@ -164,6 +165,12 @@
             <h3 class="faq-q">Can I bring my kids?</h3>
             <p class="faq-a">Yes. If they are not in your invitation, let us know so we can add them. #TODO:
                 childcare? until what time? room for nursing moms w changing table. hire a nanny for the day?</p>
+        </div>
+
+        <div class="faq-item">
+            <h3 class="faq-q">Can I bring gifts?</h3>
+            <p class="faq-a">There will be a card box and we look forward to reading every one. Please don't bring
+                anything more, we'd have no way to get it home.</p>
         </div>
 
         <div class="faq-item">
@@ -205,7 +212,6 @@
     .faq-a {
         color: var(--text);
         font-weight: 300;
-        max-width: 60ch;
     }
 
     .faq-a a {

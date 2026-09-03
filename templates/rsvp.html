@@ -6,11 +6,12 @@
 
 <div class="form-page">
   <h1 class="form-title">RSVP</h1>
-  <p class="form-subtitle">Find your household below to get started.</p>
+  <p class="form-subtitle">Find your household below to get started. You can RSVP for everyone on your invitation at
+    once.</p>
 
   <form method="post" action="{{ url_for('rsvp') }}">
     <div class="field">
-      <label for="name">Your name or household name, as per your invitation</label>
+      <label for="name">Your name as per your invitation</label>
       <input type="text" id="name" name="name" autocomplete="name" autofocus placeholder="First and last name">
     </div>
     <button type="submit" class="btn btn-green">Find my RSVP</button>

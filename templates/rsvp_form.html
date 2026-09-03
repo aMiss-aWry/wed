@@ -7,9 +7,8 @@
 <div class="form-page" style="max-width:560px;">
   <h1 class="form-title">{{ household.name }}</h1>
   <p class="form-subtitle">
-    Let us know who can make it, and choose a meal for each guest attending.
     {% if household.submitted %}
-    <strong>You've already submitted - submitting again will update your response.</strong>
+    You've already submitted - submitting again will update your response.
     {% endif %}
   </p>
   <form method="post" action="{{ url_for('rsvp_form', hid=household.id) }}" novalidate id="rsvp-form">
@@ -27,12 +26,14 @@
           {% if guest.name.startswith('+') %}
           <div class="field" style="margin-bottom:0.75rem;">
             <label for="name_{{ guest.id }}">+1 Guest Name</label>
-            <input type="text" id="name_{{ guest.id }}" name="name_{{ guest.id }}" placeholder="Full name"
-              style="max-width:440px;">
           </div>
         </span>
         {% endif %}
         <div class="attend-btns">
+          {% if guest.name.startswith('+') %}
+          <input type="text" id="name_{{ guest.id }}" name="name_{{ guest.id }}" placeholder="Full name"
+            style="flex:1; max-width:200px;">
+          {% endif %}
           <button type="button" class="attend-btn {% if guest.attending == True %}active-yes{% endif %}"
             id="yes-{{ guest.id }}" onclick="setAttending({{ guest.id }}, true)">
             Attending
@@ -127,7 +128,27 @@
     let missingMeal = false;
     let missingName = false;
     let missingAdult = false;
+    let plusOneWithoutHost = false;
+    const allInputs = Array.from(document.querySelectorAll('input[id^="attending-input-"]'));
     const attendingInputs = document.querySelectorAll('input[id^="attending-input-"]');
+
+    const anyNonPlusAttending = allInputs.some(input => {
+      const guestId = input.id.replace('attending-input-', '');
+      const nameEl = document.getElementById('name_' + guestId);
+      // not a +1 if there's no name input (name inputs only exist for + guests)
+      return input.value === 'yes' && !nameEl;
+    });
+
+    const anyPlusAttending = allInputs.some(input => {
+      const guestId = input.id.replace('attending-input-', '');
+      const nameEl = document.getElementById('name_' + guestId);
+      return input.value === 'yes' && nameEl;
+    });
+
+    if (anyPlusAttending && !anyNonPlusAttending) {
+      plusOneWithoutHost = true;
+    }
+
     const anyChildAttending = Array.from(attendingInputs).some(input => {
       const guestId = input.id.replace('attending-input-', '');
       const block = document.getElementById('guest-' + guestId);
@@ -156,11 +177,13 @@
         missingName = true;
       }
     });
-    if (missingMeal || missingName || missingAdult) {
+    if (missingMeal || missingName || missingAdult || plusOneWithoutHost) {
       e.preventDefault();
       const banner = document.getElementById('validation-banner');
       if (missingAdult) {
         banner.textContent = 'We\'re not an adoption agency!';
+      } else if (plusOneWithoutHost) {
+        banner.textContent = 'Excuuuuse you. Don\'t try to send us a plus-one in your stead.';
       } else if (missingName && missingMeal) {
         banner.textContent = 'Please enter your plus-one\'s name and select a meal for each attending guest.';
       } else if (missingName) {

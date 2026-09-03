@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,400;0,500;1,400&family=Spectral:wght@300;400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Crimson+Pro:ital,wght@0,400;0,500;1,400&family=Spectral:wght@300;400;700&display=swap');
 :root {
   --bg:         #F6F3ED;
   --surface:    #EDEAE2;
@@ -148,7 +148,6 @@ nav {
   color: var(--text);
   margin-bottom: 1rem;
   font-weight: 300;
-  max-width: 60ch;
 }
 
 /* ── Photo grid ── */
@@ -362,12 +361,17 @@ textarea { resize: vertical; min-height: 80px; }
 
 /* ── Flash messages ── */
 .flash {
-  background: #fdf0ef;
-  border-left: 3px solid var(--rose);
-  padding: 0.75rem 1rem;
+  padding: 0.6rem 0;
   margin-bottom: 1.5rem;
-  font-size: 0.875rem;
-  color: var(--text);
+  font-size: 0.9rem;
+  color: var(--rose);
+  font-family: 'Libre Baskerville', serif;
+  font-style: italic;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: var(--rose);
+  transform: rotate(-0.75deg);
+  display: inline-block;
 }
 
 /* ── Login ── */
