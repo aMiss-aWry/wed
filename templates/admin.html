@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Admin — Max & Wendy{% endblock %}
+{% block title %}Admin - Max & Wendy{% endblock %}
 
 {% block content %}
 
@@ -39,7 +39,11 @@
   <p class="admin-section-title">Meal breakdown</p>
   <table style="max-width:420px; margin-bottom:3rem;">
     <thead>
-      <tr><th>Meal</th><th>Type</th><th>Count</th></tr>
+      <tr>
+        <th>Meal</th>
+        <th>Type</th>
+        <th>Count</th>
+      </tr>
     </thead>
     <tbody>
       {% for (meal, kind), count in meal_counts.items() | sort %}
@@ -56,8 +60,8 @@
   <!-- Household list -->
   <div style="display:flex; justify-content:space-between; align-items:baseline; flex-wrap:wrap; gap:1rem;">
     <p class="admin-section-title" style="margin:0;">Guest list</p>
-    <button class="btn btn-green" style="font-size:0.7rem; padding:0.5rem 1rem;"
-            onclick="toggleForm()">+ Add household</button>
+    <button class="btn btn-green" style="font-size:0.7rem; padding:0.5rem 1rem;" onclick="toggleForm()">+ Add
+      household</button>
   </div>
 
   <!-- Add household form (hidden by default) -->
@@ -67,33 +71,38 @@
         <label>Household name</label>
         <input type="text" name="household_name" placeholder="e.g. The Zhangs, Anna Smith +1">
       </div>
-      <p style="font-size:0.75rem; text-transform:uppercase; letter-spacing:0.07em; color:var(--muted); margin-bottom:0.75rem;">Guests</p>
+      <p
+        style="font-size:0.75rem; text-transform:uppercase; letter-spacing:0.07em; color:var(--muted); margin-bottom:0.75rem;">
+        Guests</p>
       <div id="guest-fields">
         <div class="guest-field-row">
           <input type="text" name="guest_name_1" placeholder="Full name" style="flex:1;">
-          <label style="display:flex;align-items:center;gap:0.4rem;text-transform:none;letter-spacing:0;font-size:0.85rem;white-space:nowrap;">
+          <label
+            style="display:flex;align-items:center;gap:0.4rem;text-transform:none;letter-spacing:0;font-size:0.85rem;white-space:nowrap;">
             <input type="checkbox" name="guest_child_1"> Child
           </label>
         </div>
         <div class="guest-field-row">
           <input type="text" name="guest_name_2" placeholder="Full name" style="flex:1;">
-          <label style="display:flex;align-items:center;gap:0.4rem;text-transform:none;letter-spacing:0;font-size:0.85rem;white-space:nowrap;">
+          <label
+            style="display:flex;align-items:center;gap:0.4rem;text-transform:none;letter-spacing:0;font-size:0.85rem;white-space:nowrap;">
             <input type="checkbox" name="guest_child_2"> Child
           </label>
         </div>
         <div class="guest-field-row">
           <input type="text" name="guest_name_3" placeholder="Full name" style="flex:1;">
-          <label style="display:flex;align-items:center;gap:0.4rem;text-transform:none;letter-spacing:0;font-size:0.85rem;white-space:nowrap;">
+          <label
+            style="display:flex;align-items:center;gap:0.4rem;text-transform:none;letter-spacing:0;font-size:0.85rem;white-space:nowrap;">
             <input type="checkbox" name="guest_child_3"> Child
           </label>
         </div>
       </div>
       <button type="button" class="btn btn-green" style="font-size:0.7rem;padding:0.5rem 1rem;margin:0.75rem 0 1.25rem;"
-              onclick="addGuestRow()">+ Add row</button>
+        onclick="addGuestRow()">+ Add row</button>
       <br>
       <button type="submit" class="btn btn-green">Save household</button>
       <button type="button" class="btn" style="background:var(--border);color:var(--text);margin-left:0.5rem;"
-              onclick="toggleForm()">Cancel</button>
+        onclick="toggleForm()">Cancel</button>
     </form>
   </div>
 
@@ -103,44 +112,63 @@
     {% for h in households %}
     <div class="household-block">
       <div class="household-header">
-        <div>
-          <span class="household-name">{{ h.name }}</span>
-          {% if h.submitted %}
-            <span class="badge badge-yes" style="margin-left:0.5rem;">Responded</span>
-          {% else %}
-            <span class="badge" style="background:var(--surface);color:var(--muted);margin-left:0.5rem;">Pending</span>
-          {% endif %}
-          {% if h.submitted_at %}
-          <span style="color:var(--muted);font-size:0.75rem;margin-left:0.5rem;">
-            {{ h.submitted_at.strftime('%b %d') }}
-          </span>
-          {% endif %}
+        <div style="display:flex;align-items:center;gap:0.75rem;flex-wrap:wrap;">
+          <span class="household-name" id="hname-{{ h.id }}">{{ h.name }}</span>
+          {% if h.submitted %}<span class="badge badge-yes">Responded</span>{% else %}<span class="badge"
+            style="background:var(--surface);color:var(--muted);">Pending</span>{% endif %}
+          {% if h.submitted_at %}<span style="color:var(--muted);font-size:0.75rem;">{{ h.submitted_at.strftime('%b %d')
+            }}</span>{% endif %}
+          <button type="button" class="btn-text-edit" onclick="toggleHEdit({{ h.id }})">Edit name</button>
+          <form id="hedit-{{ h.id }}" style="display:none;" method="post"
+            action="{{ url_for('edit_household', hid=h.id) }}" class="inline-edit-form">
+            <input type="text" name="name" value="{{ h.name }}" style="width:200px;">
+            <button type="submit" class="btn btn-green" style="font-size:0.65rem;padding:0.4rem 0.8rem;">Save</button>
+            <button type="button" onclick="toggleHEdit({{ h.id }})" class="btn"
+              style="background:var(--border);color:var(--text);font-size:0.65rem;padding:0.4rem 0.8rem;">Cancel</button>
+          </form>
         </div>
         <form method="post" action="{{ url_for('delete_household', hid=h.id) }}"
-              onsubmit="return confirm('Delete {{ h.name }} and all their guests?')">
+          onsubmit="return confirm('Delete {{ h.name }} and all their guests?')">
           <button type="submit" class="btn-text-danger">Delete</button>
         </form>
       </div>
 
       <table style="margin-top:0.75rem;">
         <thead>
-          <tr><th>Name</th><th>Type</th><th>Attending</th><th>Meal</th><th></th></tr>
+          <tr>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Attending</th>
+            <th>Meal</th>
+            <th></th>
+          </tr>
         </thead>
         <tbody>
           {% for g in h.guests %}
           <tr>
-            <td>{{ g.name }}</td>
+            <td>
+              <span id="gname-{{ g.id }}">{{ g.name }}</span>
+              <button type="button" class="btn-text-edit" onclick="toggleGEdit({{ g.id }})">Edit</button>
+              <form id="gedit-{{ g.id }}" style="display:none;" method="post"
+                action="{{ url_for('edit_guest', gid=g.id) }}" class="inline-edit-form">
+                <input type="text" name="name" value="{{ g.name }}" style="width:150px;">
+                <label
+                  style="display:flex;align-items:center;gap:0.4rem;font-size:0.85rem;text-transform:none;letter-spacing:0;">
+                  <input type="checkbox" name="is_child" {% if g.is_child %}checked{% endif %}> Child
+                </label>
+                <button type="submit" class="btn btn-green"
+                  style="font-size:0.65rem;padding:0.4rem 0.8rem;">Save</button>
+                <button type="button" onclick="toggleGEdit({{ g.id }})" class="btn"
+                  style="background:var(--border);color:var(--text);font-size:0.65rem;padding:0.4rem 0.8rem;">Cancel</button>
+              </form>
+            </td>
             <td style="color:var(--muted);">{{ 'Child' if g.is_child else 'Adult' }}</td>
             <td>
-              {% if g.attending == True %}
-                <span class="badge badge-yes">Yes</span>
-              {% elif g.attending == False %}
-                <span class="badge badge-no">No</span>
-              {% else %}
-                <span style="color:var(--muted);font-size:0.8rem;">—</span>
-              {% endif %}
+              {% if g.attending == True %}<span class="badge badge-yes">Yes</span>
+              {% elif g.attending == False %}<span class="badge badge-no">No</span>
+              {% else %}<span style="color:var(--muted);font-size:0.8rem;">-</span>{% endif %}
             </td>
-            <td>{{ g.meal_choice or '—' }}</td>
+            <td>{{ g.meal_choice or '-' }}</td>
             <td>
               <form method="post" action="{{ url_for('delete_guest', gid=g.id) }}">
                 <button type="submit" class="btn-text-danger">✕</button>
@@ -154,7 +182,8 @@
       <!-- Add guest to existing household -->
       <form method="post" action="{{ url_for('add_guest', hid=h.id) }}" class="add-guest-inline">
         <input type="text" name="guest_name" placeholder="Add another guest…" style="width:220px;">
-        <label style="display:flex;align-items:center;gap:0.4rem;text-transform:none;letter-spacing:0;font-size:0.85rem;">
+        <label
+          style="display:flex;align-items:center;gap:0.4rem;text-transform:none;letter-spacing:0;font-size:0.85rem;">
           <input type="checkbox" name="is_child"> Child
         </label>
         <button type="submit" class="btn btn-green" style="font-size:0.65rem;padding:0.45rem 0.9rem;">Add</button>
@@ -163,7 +192,7 @@
     {% endfor %}
   </div>
   {% else %}
-  <p style="color:var(--muted);margin-top:1rem;">No households yet — add one above.</p>
+  <p style="color:var(--muted);margin-top:1rem;">No households yet - add one above.</p>
   {% endif %}
 
 </div>
@@ -200,7 +229,9 @@
     transition: color 0.15s;
   }
 
-  .btn-text-danger:hover { color: var(--rose); }
+  .btn-text-danger:hover {
+    color: var(--rose);
+  }
 
   .guest-field-row {
     display: flex;
@@ -218,6 +249,29 @@
     border-top: 1px solid var(--border);
     flex-wrap: wrap;
   }
+
+  .btn-text-edit {
+    background: none;
+    border: none;
+    color: var(--muted);
+    font-size: 0.72rem;
+    cursor: pointer;
+    padding: 0.1rem 0.3rem;
+    text-decoration: underline;
+    transition: color 0.15s;
+  }
+
+  .btn-text-edit:hover {
+    color: var(--green);
+  }
+
+  .inline-edit-form {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-top: 0.4rem;
+  }
 </style>
 
 <script>
@@ -227,7 +281,6 @@
     const f = document.getElementById('add-household-form');
     f.style.display = f.style.display === 'none' ? 'block' : 'none';
   }
-
   function addGuestRow() {
     guestRowCount++;
     const container = document.getElementById('guest-fields');
@@ -239,6 +292,14 @@
         <input type="checkbox" name="guest_child_${guestRowCount}"> Child
       </label>`;
     container.appendChild(row);
+  }
+  function toggleGEdit(id) {
+    const form = document.getElementById('gedit-' + id);
+    form.style.display = form.style.display === 'none' ? 'flex' : 'none';
+  }
+  function toggleHEdit(id) {
+    const form = document.getElementById('hedit-' + id);
+    form.style.display = form.style.display === 'none' ? 'flex' : 'none';
   }
 </script>
 

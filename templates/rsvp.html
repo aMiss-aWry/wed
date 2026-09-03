@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}RSVP — Max & Wendy{% endblock %}
+{% block title %}RSVP - Max & Wendy{% endblock %}
 
 {% block content %}
 
@@ -8,39 +8,13 @@
   <h1 class="form-title">RSVP</h1>
   <p class="form-subtitle">Find your household below to get started.</p>
 
-  {% with messages = get_flashed_messages() %}
-    {% if messages %}
-      {% for msg in messages %}<div class="flash">{{ msg }}</div>{% endfor %}
-    {% endif %}
-  {% endwith %}
-
-  {% if households %}
-  <div class="field">
-    <label for="household-select">Your household</label>
-    <select id="household-select" onchange="goToHousehold(this)">
-      <option value="" disabled selected>Select your name or family</option>
-      {% for h in households %}
-      <option value="{{ url_for('rsvp_form', hid=h.id) }}"
-              {% if h.submitted %}data-submitted="true"{% endif %}>
-        {{ h.name }}{% if h.submitted %} ✓{% endif %}
-      </option>
-      {% endfor %}
-    </select>
-  </div>
-  <button class="btn btn-green" onclick="goToHousehold(document.getElementById('household-select'))">
-    Continue
-  </button>
-  {% else %}
-  <p style="color:var(--muted);">
-    The guest list isn't set up yet — check back soon.
-  </p>
-  {% endif %}
+  <form method="post" action="{{ url_for('rsvp') }}">
+    <div class="field">
+      <label for="name">Your name or household name, as per your invitation</label>
+      <input type="text" id="name" name="name" autocomplete="name" autofocus placeholder="First and last name">
+    </div>
+    <button type="submit" class="btn btn-green">Find my RSVP</button>
+  </form>
 </div>
-
-<script>
-  function goToHousehold(select) {
-    if (select.value) window.location = select.value;
-  }
-</script>
 
 {% endblock %}

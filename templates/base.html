@@ -1,37 +1,43 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+  <link rel="icon"
+    href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text x='50' y='.9em' font-size='90' text-anchor='middle'>♥</text></svg>">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{% block title %}Max & Wendy{% endblock %}</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
+
 <body>
 
-<nav>
-  <a class="nav-brand" href="{{ url_for('index') }}">Max & Wendy</a>
-  <ul class="nav-links">
-    <li><a href="{{ url_for('index') }}#schedule">Schedule</a></li>
-    <li><a href="{{ url_for('index') }}#travel">Travel</a></li>
-    <li><a href="{{ url_for('rsvp') }}">RSVP</a></li>
-    {% if session.get('admin') %}
-    <li><a href="{{ url_for('admin') }}">Admin</a></li>
-    {% endif %}
-    <li><a href="{{ url_for('logout') }}">Sign out</a></li>
-  </ul>
-</nav>
+  <nav>
+    <a class="nav-brand" href="{{ url_for('index') }}">Max & Wendy</a>
+    <ul class="nav-links">
+      <li><a href="{{ url_for('index') }}">Welcome</a></li>
+      <li><a href="{{ url_for('schedule') }}">Schedule</a></li>
+      <li><a href="{{ url_for('details') }}">Details</a></li>
+      <li><a href="{{ url_for('rsvp') }}">RSVP</a></li>
+      {% if session.get('admin') %}
+      <li><a href="{{ url_for('admin') }}">Admin</a></li>
+      <li><a href="{{ url_for('logout') }}">Sign out</a></li>
+      {% endif %}
+    </ul>
+  </nav>
 
-{% with messages = get_flashed_messages() %}
+  {% with messages = get_flashed_messages() %}
   {% if messages %}
-    <div style="max-width:680px;margin:1rem auto;padding:0 2rem;">
-      {% for msg in messages %}
-        <div class="flash">{{ msg }}</div>
-      {% endfor %}
-    </div>
+  <div style="max-width:680px;margin:1rem auto;padding:0 2rem;">
+    {% for msg in messages %}
+    <div class="flash">{{ msg }}</div>
+    {% endfor %}
+  </div>
   {% endif %}
-{% endwith %}
+  {% endwith %}
 
-{% block content %}{% endblock %}
+  {% block content %}{% endblock %}
 
 </body>
+
 </html>

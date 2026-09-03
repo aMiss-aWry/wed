@@ -7,6 +7,11 @@ from functools import wraps
 from flask import (Flask, render_template, request, redirect,
                    url_for, session, flash, Response)
 from flask_sqlalchemy import SQLAlchemy
+import random, requests
+from flask import jsonify
+
+DRIVE_API_KEY = os.environ.get('GOOGLE_DRIVE_API_KEY')
+DRIVE_FOLDER_ID = os.environ.get('GOOGLE_DRIVE_FOLDER_ID')
 
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'dev-secret-change-me')
@@ -83,7 +88,7 @@ def login():
             session['logged_in'] = True
             return redirect(url_for('index'))
         else:
-            flash("That password doesn't seem right — try again.")
+            flash("That password doesn't seem right - try again.")
     return render_template('login.html')
 
 
@@ -98,14 +103,56 @@ def logout():
 @app.route('/')
 @login_required
 def index():
-    return render_template('index.html')
+    image_dir = os.path.join(app.static_folder, 'images', 'WeddingSite')
+    try:
+        images = [
+            f"images/WeddingSite/{f}"
+            for f in os.listdir(image_dir)
+            if f.lower().endswith(('.jpg', '.jpeg', '.png', '.webp'))
+        ]
+    except FileNotFoundError:
+        images = []
+    return render_template('index.html', images=images)
 
+@app.route('/schedule')
+@login_required
+def schedule():
+    return render_template('schedule.html')
 
-@app.route('/rsvp')
+@app.route('/details')
+@login_required
+def details():
+    return render_template('details.html')
+
+@app.route('/rsvp', methods=['GET', 'POST'])
 @login_required
 def rsvp():
-    households = Household.query.order_by(Household.name).all()
-    return render_template('rsvp.html', households=households)
+    if request.method == 'POST':
+        search = request.form.get('name', '').strip()
+        if not search:
+            flash('Please enter your name.')
+            return render_template('rsvp.html')
+
+        guest = Guest.query.filter(
+            db.func.lower(Guest.name) == search.lower(),
+            Guest.is_child == False,
+            ~Guest.name.startswith('+')
+        ).first()
+
+        if guest:
+            return redirect(url_for('rsvp_form', hid=guest.household_id))
+
+        household = Household.query.filter(
+            db.func.lower(Household.name) == search.lower()
+        ).first()
+
+        if household:
+            return redirect(url_for('rsvp_form', hid=household.id))
+
+        flash("We couldn't find that name - check your invitation and try again.")
+        return render_template('rsvp.html')
+
+    return render_template('rsvp.html')
 
 
 @app.route('/rsvp/<int:hid>', methods=['GET', 'POST'])
@@ -117,6 +164,19 @@ def rsvp_form(hid):
         any_attending = False
 
         for guest in household.guests:
+            # Allow +1 guests to set their real name
+            new_name = request.form.get(f'name_{guest.id}', '').strip()
+            attending_val = request.form.get(f'attending_{guest.id}')
+
+            # +1 guests must be named if attending
+            if guest.name.startswith('+') and attending_val == 'yes' and not new_name:
+                flash('Please enter a name for your plus-one.')
+                return render_template('rsvp_form.html', household=household,
+                                    meal_options_adult=MEAL_OPTIONS_ADULT,
+                                    meal_options_child=MEAL_OPTIONS_CHILD)
+
+            if new_name:
+                guest.name = new_name
             attending_val = request.form.get(f'attending_{guest.id}')
             guest.attending = (attending_val == 'yes')
 
@@ -135,19 +195,40 @@ def rsvp_form(hid):
 
         household.submitted_at = datetime.utcnow()
         db.session.commit()
-        return redirect(url_for('rsvp_confirm', attending=any_attending))
+        return redirect(url_for('rsvp_confirm', hid=household.id))
 
     return render_template('rsvp_form.html', household=household,
                            meal_options_adult=MEAL_OPTIONS_ADULT,
                            meal_options_child=MEAL_OPTIONS_CHILD)
 
 
-@app.route('/rsvp/confirm')
+@app.route('/rsvp/confirm/<int:hid>')
 @login_required
-def rsvp_confirm():
-    attending = request.args.get('attending', 'True') == 'True'
-    return render_template('rsvp_confirm.html', attending=attending)
+def rsvp_confirm(hid):
+    household = Household.query.get_or_404(hid)
+    attending = any(g.attending for g in household.guests)
+    return render_template('rsvp_confirm.html', household=household, attending=attending)
 
+@app.route('/api/photos')
+@login_required
+def photos():
+    if not DRIVE_API_KEY or not DRIVE_FOLDER_ID:
+        return jsonify([])
+
+    resp = requests.get(
+        'https://www.googleapis.com/drive/v3/files',
+        params={
+            'q': f"'{DRIVE_FOLDER_ID}' in parents and mimeType contains 'image/'",
+            'key': DRIVE_API_KEY,
+            'fields': 'files(id)',
+            'pageSize': 50,
+        }
+    )
+
+    files = resp.json().get('files', [])
+    urls = [f"https://drive.google.com/thumbnail?id={f['id']}&sz=w800" for f in files]
+    random.shuffle(urls)
+    return jsonify(urls[:4])
 
 # ── Admin routes ──────────────────────────────────────────────────────────────
 
@@ -219,6 +300,27 @@ def add_guest(hid):
         db.session.commit()
     return redirect(url_for('admin'))
 
+@app.route('/admin/guests/<int:gid>/edit', methods=['POST'])
+@admin_required
+def edit_guest(gid):
+    guest = Guest.query.get_or_404(gid)
+    name = request.form.get('name', '').strip()
+    if name:
+        guest.name = name
+    guest.is_child = request.form.get('is_child') == 'on'
+    db.session.commit()
+    return redirect(url_for('admin'))
+
+
+@app.route('/admin/households/<int:hid>/edit', methods=['POST'])
+@admin_required
+def edit_household(hid):
+    household = Household.query.get_or_404(hid)
+    name = request.form.get('name', '').strip()
+    if name:
+        household.name = name
+    db.session.commit()
+    return redirect(url_for('admin'))
 
 @app.route('/admin/guests/<int:gid>/delete', methods=['POST'])
 @admin_required

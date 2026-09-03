@@ -1,0 +1,216 @@
+<!-- src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDUctIO_LzPUGcOQP37JC92b1RX869zsz0&loading=async&libraries=place&callback=initMap" -->
+
+{% extends "base.html" %}
+
+{% block title %}Details — Max & Wendy{% endblock %}
+
+{% block content %}
+
+<div class="content">
+    <section class="section" style="padding-top:3rem;">
+        <h1 class="section-title" style="font-size:2.75rem;">Details</h1>
+    </section>
+    <!-- Travel -->
+    <section class="section" id="travel">
+        <div style="position: relative; height: 457px; overflow: hidden;">
+            <div id="map" style="height: 470px;"></div>
+            <div style="
+                position: absolute;
+                inset: 0;
+                pointer-events: none;
+                background: radial-gradient(
+                    ellipse at center,
+                    transparent 40%,
+                    #F6F3ED 90%
+                );
+            "></div>
+        </div>
+        <script async
+            src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDUctIO_LzPUGcOQP37JC92b1RX869zsz0&loading=async&callback=initMap"></script>
+        </script>
+        <script>
+            let map;
+
+            function initMap() {
+                // Create the map with no initial style specified.
+                // It therefore has default styling.
+                map = new google.maps.Map(document.getElementById("map"), {
+                    center: { lat: 32.22013546015271, lng: -110.96724099982893 },
+                    zoom: 18,
+                    mapTypeControl: false,
+                    streetViewControl: false,
+                    disableDefaultUI: true
+                });
+
+                // Add a style-selector control to the map.
+                const styleControl = document.getElementById("style-selector-control");
+
+                map.controls[google.maps.ControlPosition.TOP_LEFT].push(styleControl);
+
+                // Set the map's style to the initial value of the selector.
+                const styleSelector = document.getElementById("style-selector");
+
+                map.setOptions({ styles: styles["default"] });
+
+            }
+            const styles = {
+                default: [
+                    {
+                        featureType: "landscape",
+                        stylers: [{ color: "#665642" }],
+                    },
+                    {
+                        featureType: "landscape.natural",
+                        stylers: [{ color: "#F7F7E9" }],
+                    },
+                    {
+                        featureType: "landscape.man_made",
+                        elementType: "geometry.fill",
+                        stylers: [{ color: "#F6F3ED" }],
+                    },
+                    { elementType: "labels", stylers: [{ color: "#FCE7CA" }] },
+                    { elementType: "labels.text.fill", stylers: [{ color: "#523735" }] },
+                    { elementType: "labels.text.stroke", stylers: [{ color: "#f5f1e6" }] },
+                    {
+                        featureType: "administrative",
+                        elementType: "geometry.stroke",
+                        stylers: [{ color: "#fec0c0" }],
+                    },
+                    {
+                        featureType: "administrative.land_parcel",
+                        elementType: "labels.text.fill",
+                        stylers: [{ color: "#f7f7f7" }],
+                    },
+                    {
+                        featureType: "road",
+                        elementType: "geometry",
+                        stylers: [{ color: "#f5e6e2" }],
+                    },
+                    {
+                        featureType: "road.arterial",
+                        elementType: "geometry",
+                        stylers: [{ color: "#F2D8DF" }],
+                    },
+                    {
+                        featureType: "road.highway",
+                        elementType: "geometry",
+                        stylers: [{ color: "#FFE0E7" }],
+                    },
+                    {
+                        featureType: "road.local",
+                        elementType: "labels.text.fill",
+                        stylers: [{ color: "#806b63" }],
+                    },
+                    {
+                        featureType: "road",
+                        elementType: "labels.icon",
+                        stylers: [
+                            { visibility: "off" }
+                        ]
+                    },
+                    {
+                        featureType: "water",
+                        elementType: "geometry",
+                        stylers: [{ color: "#ADD8E6" }],
+                    },
+                    {
+                        featureType: "poi",
+                        elementType: "geometry",
+                        stylers: [{ color: "#dfd2ae" }],
+                    },
+                    {
+                        featureType: "poi",
+                        elementType: "labels.text.fill",
+                        stylers: [{ color: "#93817c" }],
+                    },
+                    {
+                        featureType: "poi.park",
+                        elementType: "geometry.fill",
+                        stylers: [{ color: "#e9f7e5" }],
+                    },
+                ],
+            };
+            window.initMap = initMap;
+        </script>
+        <h2 class="section-title">Getting There</h2>
+        <p>
+            The closest airport is <strong>#TODO: Airport name and code</strong>, about
+            #TODO: minutes from the venue. We recommend arriving the day before if you
+            can.
+        </p>
+        <p>
+            <strong>Hotel block:</strong> We've reserved a room block at the
+            #TODO: ?? at a discounted rate. Use code <strong>[CODE]</strong>
+            when booking, or call #TODO: hotel phone. The block closes #TODO: date.
+        </p>
+        <p>
+            <strong>Parking:</strong> #TODO: venue name has #TODO: ? free on-site parking ?.
+            Rideshares and taxis are also plentiful. #TODO: uber/lyft code if we decide to be somewhere annoying
+        </p>
+    </section>
+
+    <hr style="border:none;border-top:1px solid var(--border);margin-bottom:3.5rem;">
+
+    <!-- FAQ -->
+    <section class="section" id="faq">
+        <h2 class="section-title">FAQ</h2>
+
+        <div class="faq-item">
+            <h3 class="faq-q">What's the dress code?</h3>
+            <p class="faq-a">We're asking for semi-formal attire: cocktail dresses, pantsuits, jumpsuits, slacks with
+                a dress shirt. Suits and ties are welcome but not expected.
+            </p>
+        </div>
+
+        <div class="faq-item">
+            <h3 class="faq-q">Can I bring my kids?</h3>
+            <p class="faq-a">Yes. If they are not in your invitation please let us know so we can add them. #TODO:
+                childcare? until what time? room for nursing moms w changing table. hire a nanny for the day?</p>
+        </div>
+
+        <div class="faq-item">
+            <h3 class="faq-q">Will there be an open bar?</h3>
+            <p class="faq-a">Yes #TODO maybe</p>
+        </div>
+
+        <div class="faq-item">
+            <h3 class="faq-q">Can I take photos during the ceremony?</h3>
+            <p class="faq-a">No, we will have a photographer and we don't want to see your phones in our wedding
+                pictures.</p>
+        </div>
+
+        <div class="faq-item">
+            <h3 class="faq-q">What if I have questions not answered here?</h3>
+            <p class="faq-a">Reach out at <a href="mailto:[wendywang@arizona.edu]">wendywang@arizona.edu</a> or however
+                we communicate.</p>
+        </div>
+
+    </section>
+
+</div>
+
+{% endblock %}
+
+<style>
+    .faq-item {
+        margin-bottom: 2rem;
+    }
+
+    .faq-q {
+        font-family: 'Cormorant Garamond', serif;
+        font-weight: 400;
+        font-size: 1.25rem;
+        color: var(--green);
+        margin-bottom: 0.4rem;
+    }
+
+    .faq-a {
+        color: var(--text);
+        font-weight: 300;
+        max-width: 60ch;
+    }
+
+    .faq-a a {
+        color: var(--green);
+    }
+</style>

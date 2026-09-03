@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}RSVP Received — Max & Wendy{% endblock %}
+{% block title %}RSVP Received - Max & Wendy{% endblock %}
 
 {% block content %}
 
@@ -8,20 +8,42 @@
   <div class="confirm-inner">
 
     {% if attending %}
-      <div class="confirm-mark">♡</div>
-      <h2 class="confirm-title">See you there.</h2>
-      <p class="confirm-text">
-        We're so glad you can make it. We can't wait to celebrate with you.
-      </p>
+    <div class="confirm-mark">♡</div>
+    <h2 class="confirm-title">See you there.</h2>
+    <p class="confirm-text">We're glad you can make it!</p>
+
+    <table style="text-align:left; margin: 1.5rem auto 2rem; width:100%;">
+      <thead>
+        <tr>
+          <th>Guest</th>
+          <th>Meal</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for g in household.guests %}
+        {% if g.attending %}
+        <tr>
+          <td>{{ g.name }}</td>
+          <td>{{ g.meal_choice or '-' }}</td>
+        </tr>
+        {% endif %}
+        {% endfor %}
+      </tbody>
+    </table>
+
     {% else %}
-      <div class="confirm-mark">✦</div>
-      <h2 class="confirm-title">We'll miss you.</h2>
-      <p class="confirm-text">
-        Thank you for letting us know. We'll be thinking of you on the day.
-      </p>
+    <div class="confirm-mark">♥</div>
+    <h2 class="confirm-title">We'll miss you.</h2>
+    <p class="confirm-text">Thank you for letting us know. We'll be thinking of you on the day.</p>
     {% endif %}
 
-    <a href="{{ url_for('index') }}" class="btn btn-green">Back to the site</a>
+    <a href="{{ url_for('rsvp_form', hid=household.id) }}" class="btn btn-green">
+      Edit my RSVP
+    </a>
+    &nbsp;
+    <a href="{{ url_for('index') }}" class="btn" style="background:var(--border);color:var(--text);">
+      Back to the site
+    </a>
 
   </div>
 </div>
