@@ -19,17 +19,17 @@
 
   <!-- Photos -->
   <section class="section">
-    <div class="photo-grid" id="photo-grid"></div>
+    <div class="photo-grid">
+      {% for image in images %}
+      <img src="/static/{{ image }}" alt="" loading="lazy">
+      {% else %}
+      <div class="photo-placeholder">photo</div>
+      <div class="photo-placeholder">photo</div>
+      <div class="photo-placeholder">photo</div>
+      <div class="photo-placeholder">photo</div>
+      {% endfor %}
+    </div>
   </section>
-
-  <script>
-    const photos = {{ images | tojson }};
-    const shuffled = photos.sort(() => Math.random() - 0.5).slice(0, 4);
-    const grid = document.getElementById('photo-grid');
-    grid.innerHTML = shuffled.map(p =>
-      `<img src="/static/${p}" alt="" loading="lazy">`
-    ).join('');
-  </script>
 
   <!-- Our Story -->
   <section class="section">

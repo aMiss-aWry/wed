@@ -7,7 +7,7 @@ from functools import wraps
 from flask import (Flask, render_template, request, redirect,
                    url_for, session, flash, Response)
 from flask_sqlalchemy import SQLAlchemy
-import random, requests
+import random
 from flask import jsonify
 
 DRIVE_API_KEY = os.environ.get('GOOGLE_DRIVE_API_KEY')
@@ -100,6 +100,7 @@ def logout():
 
 # ── Public routes ─────────────────────────────────────────────────────────────
 
+
 @app.route('/')
 @login_required
 def index():
@@ -110,9 +111,12 @@ def index():
             for f in os.listdir(image_dir)
             if f.lower().endswith(('.jpg', '.jpeg', '.png', '.webp'))
         ]
+        random.shuffle(images)
+        images = images[:4]
     except FileNotFoundError:
         images = []
     return render_template('index.html', images=images)
+
 
 @app.route('/schedule')
 @login_required
@@ -209,26 +213,6 @@ def rsvp_confirm(hid):
     attending = any(g.attending for g in household.guests)
     return render_template('rsvp_confirm.html', household=household, attending=attending)
 
-@app.route('/api/photos')
-@login_required
-def photos():
-    if not DRIVE_API_KEY or not DRIVE_FOLDER_ID:
-        return jsonify([])
-
-    resp = requests.get(
-        'https://www.googleapis.com/drive/v3/files',
-        params={
-            'q': f"'{DRIVE_FOLDER_ID}' in parents and mimeType contains 'image/'",
-            'key': DRIVE_API_KEY,
-            'fields': 'files(id)',
-            'pageSize': 50,
-        }
-    )
-
-    files = resp.json().get('files', [])
-    urls = [f"https://drive.google.com/thumbnail?id={f['id']}&sz=w800" for f in files]
-    random.shuffle(urls)
-    return jsonify(urls[:4])
 
 # ── Admin routes ──────────────────────────────────────────────────────────────
 
