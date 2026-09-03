@@ -370,7 +370,6 @@ textarea { resize: vertical; min-height: 80px; }
   text-decoration: underline;
   text-underline-offset: 3px;
   text-decoration-color: var(--rose);
-  transform: rotate(-0.75deg);
   display: inline-block;
 }
 

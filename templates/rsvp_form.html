@@ -22,18 +22,13 @@
           {% if not guest.name.startswith('+') %}
           {{ guest.name }}
           {% endif %}
-          {% if guest.is_child %}<span class="child-tag">child</span>{% endif %}
-          {% if guest.name.startswith('+') %}
-          <div class="field" style="margin-bottom:0.75rem;">
-            <label for="name_{{ guest.id }}">+1 Guest Name</label>
-          </div>
-        </span>
-        {% endif %}
-        <div class="attend-btns">
-          {% if guest.name.startswith('+') %}
-          <input type="text" id="name_{{ guest.id }}" name="name_{{ guest.id }}" placeholder="Full name"
-            style="flex:1; max-width:200px;">
+          {% if guest.is_plus_one %}
+          <input type="text" id="name_{{ guest.id }}" name="name_{{ guest.id }}" placeholder="+1 guest name"
+            value="{{ guest.name if not guest.name.startswith('+') else '' }}">
           {% endif %}
+          {% if guest.is_child %}<span class="child-tag">child</span>{% endif %}
+        </span>
+        <div class="attend-btns">
           <button type="button" class="attend-btn {% if guest.attending == True %}active-yes{% endif %}"
             id="yes-{{ guest.id }}" onclick="setAttending({{ guest.id }}, true)">
             Attending
@@ -129,8 +124,16 @@
     let missingName = false;
     let missingAdult = false;
     let plusOneWithoutHost = false;
+    let missingAttendance = false;
+
     const allInputs = Array.from(document.querySelectorAll('input[id^="attending-input-"]'));
     const attendingInputs = document.querySelectorAll('input[id^="attending-input-"]');
+
+    allInputs.forEach(input => {
+      if (input.value !== 'yes' && input.value !== 'no') {
+        missingAttendance = true;
+      }
+    });
 
     const anyNonPlusAttending = allInputs.some(input => {
       const guestId = input.id.replace('attending-input-', '');
@@ -177,13 +180,15 @@
         missingName = true;
       }
     });
-    if (missingMeal || missingName || missingAdult || plusOneWithoutHost) {
+    if (missingMeal || missingName || missingAdult || plusOneWithoutHost || missingAttendance) {
       e.preventDefault();
       const banner = document.getElementById('validation-banner');
       if (missingAdult) {
         banner.textContent = 'We\'re not an adoption agency!';
+      } else if (missingAttendance) {
+        banner.textContent = 'Select attending or not attending for each guest.';
       } else if (plusOneWithoutHost) {
-        banner.textContent = 'Excuuuuse you. Don\'t try to send us a plus-one in your stead.';
+        banner.textContent = 'Don\'t you try to send us a plus-one in your stead.';
       } else if (missingName && missingMeal) {
         banner.textContent = 'Please enter your plus-one\'s name and select a meal for each attending guest.';
       } else if (missingName) {
@@ -191,6 +196,8 @@
       } else {
         banner.textContent = 'Please select a meal for each attending guest.';
       }
+      const deg = (Math.random() * 10 - 5).toFixed(2);
+      banner.style.transform = `rotate(${deg}deg)`;
       banner.style.display = 'block';
       banner.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }

@@ -51,7 +51,8 @@ class Guest(db.Model):
     household_id = db.Column(db.Integer, db.ForeignKey('household.id'), nullable=False)
     name         = db.Column(db.String(200), nullable=False)
     is_child     = db.Column(db.Boolean, default=False)
-    attending    = db.Column(db.Boolean, nullable=True)   # None = not yet answered
+    is_plus_one  = db.Column(db.Boolean, default=False)
+    attending    = db.Column(db.Boolean, nullable=True)
     meal_choice  = db.Column(db.String(50), nullable=True)
 
 
@@ -166,13 +167,16 @@ def rsvp_form(hid):
     household = Household.query.get_or_404(hid)
 
     if request.method == 'POST':
-        any_attending = False
 
         for guest in household.guests:
             # Allow +1 guests to set their real name
             new_name = request.form.get(f'name_{guest.id}', '').strip()
             attending_val = request.form.get(f'attending_{guest.id}')
-
+            if attending_val not in ('yes', 'no'):
+                flash('Please confirm attendance for every guest in your party.')
+                return render_template('rsvp_form.html', household=household,
+                                    meal_options_adult=MEAL_OPTIONS_ADULT,
+                                    meal_options_child=MEAL_OPTIONS_CHILD)
             # +1 guests must be named if attending
             if guest.name.startswith('+') and attending_val == 'yes' and not new_name:
                 flash('Enter a name for your plus-one.')
@@ -182,11 +186,9 @@ def rsvp_form(hid):
 
             if new_name:
                 guest.name = new_name
-            attending_val = request.form.get(f'attending_{guest.id}')
             guest.attending = (attending_val == 'yes')
 
             if guest.attending:
-                any_attending = True
                 options = MEAL_OPTIONS_CHILD if guest.is_child else MEAL_OPTIONS_ADULT
                 meal = request.form.get(f'meal_{guest.id}', '').strip()
                 if meal not in options:
@@ -283,7 +285,11 @@ def add_household():
         if not guest_name:
             break
         is_child = request.form.get(f'guest_child_{i}') == 'on'
-        household.guests.append(Guest(name=guest_name, is_child=is_child))
+        household.guests.append(Guest(
+            name=guest_name,
+            is_child=is_child,
+            is_plus_one=guest_name.startswith('+')
+        ))
         i += 1
 
     db.session.commit()
@@ -306,7 +312,11 @@ def add_guest(hid):
     name = request.form.get('guest_name', '').strip()
     if name:
         is_child = request.form.get('is_child') == 'on'
-        household.guests.append(Guest(name=name, is_child=is_child))
+        household.guests.append(Guest(
+            name=name,
+            is_child=is_child,
+            is_plus_one=name.startswith('+')
+        ))
         db.session.commit()
     return redirect(url_for('admin'))
 
