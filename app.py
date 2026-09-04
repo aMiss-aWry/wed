@@ -119,6 +119,10 @@ def index():
         images = []
     return render_template('index.html', images=images)
 
+@app.route('/dognap')
+@login_required
+def dognap():
+    return render_template('dognap.html')
 
 @app.route('/schedule')
 @login_required

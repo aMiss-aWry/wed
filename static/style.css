@@ -79,7 +79,7 @@ nav {
 /* ── Hero ── */
 .hero {
   text-align: center;
-  padding: 7rem 2rem 5rem;
+  padding: 5rem 2rem .7rem;
 }
 
 .hero-names {
@@ -109,7 +109,11 @@ nav {
   background: var(--rose);
 }
 
-.hero-divider-icon { font-size: 0.45rem; }
+.hero-divider-icon {
+  font-size: 0.45rem;
+  position: relative;
+  top: 1px;
+}
 
 .hero-date {
   font-family: 'Spectral', serif;
