@@ -724,6 +724,8 @@
     let dogImageAssignments = {};
     let currentPalette = PALETTES[0];
     let isGameOver = false;
+    let longPressTimer = null;
+    let longPressFired = false;
     let isTimerOn = false;
     let timerCount = 0;
     let finalTime = 0;
@@ -787,7 +789,7 @@
         grid.appendChild(tile);
         tiles.push(tile);
 
-        //left click
+        //left click / tap
         tile.addEventListener("click", () => clickTile(tile));
 
         //ctrl and right click
@@ -795,6 +797,17 @@
           e.preventDefault();
           addFlag(tile);
         };
+
+        // long press for flag on mobile
+        tile.addEventListener("touchstart", () => {
+          longPressFired = false;
+          longPressTimer = setTimeout(() => {
+            longPressFired = true;
+            addFlag(tile);
+          }, 500);
+        }, { passive: true });
+        tile.addEventListener("touchmove",  () => clearTimeout(longPressTimer), { passive: true });
+        tile.addEventListener("touchend",   () => clearTimeout(longPressTimer), { passive: true });
 
       }
 
@@ -865,6 +878,7 @@
 
     //click on tile
     function clickTile(tile) {
+      if (longPressFired) { longPressFired = false; return; }
       closeTask();
       if (!isTimerOn) startTimer();
       let currentId = tile.id;
