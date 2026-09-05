@@ -726,17 +726,19 @@
       flags = 0;
       if (isTimerOn) stopTimer();
       timerCount = 0;
-
-      // isTimerOn = false;
       timer.innerHTML = "000";
-      tiles.forEach((tile) => {
-        tile.remove();
-      });
+
+      // explicitly clear the grid and reset its dimensions
+      grid.innerHTML = '';
+      root.style.removeProperty("--grid-width");
+
       tiles = [];
       container.classList.remove("shake");
       boopHappyFace.classList.remove("show");
       resultTime.classList.remove("show");
       document.getElementById("game-over-bar").classList.remove("show");
+      document.getElementById("leaderboard-loss").style.display = "none";
+      document.getElementById("leaderboard-body-loss").innerHTML = "";
       createBoard();
     }
 
