@@ -23,6 +23,7 @@
     padding: 2rem 1rem;
     overflow-x: hidden;
     font-family: 'Special Elite', serif;
+    user-select: none;
   }
 
   *,
@@ -806,8 +807,8 @@
             addFlag(tile);
           }, 500);
         }, { passive: true });
-        tile.addEventListener("touchmove",  () => clearTimeout(longPressTimer), { passive: true });
-        tile.addEventListener("touchend",   () => clearTimeout(longPressTimer), { passive: true });
+        tile.addEventListener("touchmove", () => clearTimeout(longPressTimer), { passive: true });
+        tile.addEventListener("touchend", () => clearTimeout(longPressTimer), { passive: true });
 
       }
 
