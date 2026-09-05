@@ -615,7 +615,7 @@
       {
         name: "Easy",
         width: 10,
-        boops: 2,
+        boops: 15,
       },
       {
         name: "Medium",
@@ -709,7 +709,7 @@
     function applyPalette() {
       const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
       if (isDarkMode) {
-        currentPalette = DARKMODE_PALETTES[Math.floor(Math.random() * PALETTES.length)];
+        currentPalette = DARKMODE_PALETTES[Math.floor(Math.random() * DARKMODE_PALETTES.length)];
       } else {
         currentPalette = PALETTES[Math.floor(Math.random() * PALETTES.length)];
       }
