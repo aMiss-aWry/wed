@@ -615,7 +615,7 @@
       {
         name: "Easy",
         width: 10,
-        boops: 15,
+        boops: 2,
       },
       {
         name: "Medium",
@@ -737,8 +737,6 @@
       boopHappyFace.classList.remove("show");
       resultTime.classList.remove("show");
       document.getElementById("game-over-bar").classList.remove("show");
-      document.getElementById("leaderboard-loss").style.display = "none";
-      document.getElementById("leaderboard-body-loss").innerHTML = "";
       createBoard();
     }
 
@@ -751,15 +749,13 @@
     function createBoard() {
       grid.innerHTML = '';
       tiles = [];
-      loadLeaderboard(selectedLevel.name, 'leaderboard-body-permanent', 'leaderboard-permanent')
-      applyPalette();
-      flagsLeft.innerHTML = selectedLevel.boops;
       const width = selectedLevel.width;
       const tileWidth = parseInt(
         getComputedStyle(root).getPropertyValue("--tile-width")
       );
+      loadLeaderboard(selectedLevel.name, 'leaderboard-body-permanent', 'leaderboard-permanent');
+      applyPalette()
       root.style.setProperty("--grid-width", (width * tileWidth) + "px");
-
       //add tiles
       for (let i = 0; i < width * width; i++) {
         const tile = document.createElement("div");
@@ -776,6 +772,7 @@
           e.preventDefault();
           addFlag(tile);
         };
+
       }
 
       //add boops
