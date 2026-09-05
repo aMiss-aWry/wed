@@ -119,11 +119,6 @@ def index():
         images = []
     return render_template('index.html', images=images)
 
-@app.route('/dognap')
-@login_required
-def dognap():
-    return render_template('dognap.html')
-
 @app.route('/schedule')
 @login_required
 def schedule():
@@ -378,9 +373,16 @@ def export():
         headers={'Content-Disposition': 'attachment; filename=rsvps.csv'},
     )
 
+# ── Just for fun
+
+@app.route('/dognap')
+def dognap():
+    return render_template('dognap.html')
+
 
 with app.app_context():
     db.create_all()
 
 if __name__ == '__main__':
     app.run(debug=False)
+
