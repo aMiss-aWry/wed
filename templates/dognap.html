@@ -35,12 +35,19 @@
   }
 
   .container {
-    width: var(--grid-width);
+    width: min(var(--grid-width), 100vw);
     align-content: center;
     text-align: center;
     box-shadow: 5px 5px 20px 0 rgba(100, 74, 74, 0.1);
     position: relative;
     z-index: 2;
+  }
+
+  #grid-scroll-wrapper {
+    overflow: auto;
+    max-width: 100%;
+    max-height: 70vh;
+    -webkit-overflow-scrolling: touch;
   }
 
   #task-accordion {
@@ -152,7 +159,7 @@
   #flag-countdown,
   #timer {
     display: flex;
-    font-size: 30px;
+    font-size: 1.5rem;
     font-family: Verdana, sans-serif
   }
 
@@ -206,7 +213,8 @@
 
   #result-columns {
     display: flex;
-    align-items: flex-start;
+    align-items: center;
+    justify-content: center;
   }
 
   #result-left {
@@ -219,7 +227,7 @@
     flex: 1;
     padding: 2rem;
     border-left: 1px solid #e8e4ff;
-    text-align: left;
+    text-align: center;
     min-width: 0;
   }
 
@@ -227,18 +235,22 @@
     #result-columns {
       flex-direction: column;
     }
+
     #result-right {
       border-left: none;
       border-top: 1px solid #e8e4ff;
       padding-top: 1rem;
       width: 100%;
     }
+
     #result-left {
       padding: 1rem;
     }
+
     svg#boop {
       width: 120px;
     }
+
     #result-message {
       font-size: 1.4rem;
     }
@@ -546,7 +558,7 @@
           <h2 class="result-time">Your time: <span class="time-display"></span> seconds</h2>
           <div id="score-entry" style="display:none; margin-top:1rem;">
             <input type="text" id="score-name" placeholder="Enter your name"
-              style="font-family:'Special Elite',serif; padding:0.4rem 0.6rem;"><br>
+              style="font-family:'Special Elite',serif; padding:0.4rem 0.6rem; margin-bottom: 0.75rem;">
             <button onclick="submitScore()" class="dognap-btn">Submit</button>
             <input type="hidden" id="score-difficulty">
             <input type="hidden" id="score-time">
@@ -606,7 +618,9 @@
           </g>
         </svg><span class="counter">000</span></div>
     </div>
-    <div class="grid"></div>
+    <div id="grid-scroll-wrapper">
+      <div class="grid" id="grid"></div>
+    </div>
   </div>
   <div id="game-over-bar">
     <button class="game-over-new-game">You ruined naptime! New Game</button>
@@ -924,11 +938,13 @@
           tile.style.textShadow =
             "1px 1px" + lightenDarkenColor(currentPalette.numberColors[total - 1], -20);
           tile.innerHTML = total;
+          checkForWin();
           return;
         }
         checktile(currentId);
       }
       tile.classList.add("checked");
+      checkForWin();
     }
 
     //check neighboring tiles once tile is clicked
@@ -1007,7 +1023,6 @@
           tile.innerHTML = flagIcon;
           flags++;
           flagsLeft.innerHTML = selectedLevel.boops - flags;
-          checkForWin();
         } else {
           tile.classList.remove("flag");
           tile.innerHTML = "";
@@ -1017,36 +1032,32 @@
       }
     }
     function checkForWin() {
-      let matches = 0;
-      tiles.forEach((tile) => {
-        if (
-          tile.classList.contains("flag") &&
-          tile.classList.contains("has-boop")
-        ) {
-          matches++;
-        }
-        if (matches === selectedLevel.boops) {
-          stopTimer();
-          isGameOver = true;
+      const totalTiles = tiles.length;
+      const totalMines = selectedLevel.boops;
+      const checkedNonMines = tiles.filter(tile =>
+        tile.classList.contains("checked") &&
+        !tile.classList.contains("has-boop")
+      ).length;
+      console.log(totalTiles - totalMines);
+      console.log(checkedNonMines);
+      console.log("-")
 
-          result.innerHTML = "you did it!";
-          boopHappyFace.classList.add("show");
-          resultTime.classList.add("show");
-          loadLeaderboard(selectedLevel.name, 'leaderboard-body', 'leaderboard');
+      if (checkedNonMines === totalTiles - totalMines) {
+        stopTimer();
+        isGameOver = true;
 
-          // Show name input for leaderboard
-          document.getElementById('score-entry').style.display = 'block';
-          document.getElementById('score-name').focus();
-          document.getElementById('score-difficulty').value = selectedLevel.name;
-          document.getElementById('score-time').value = finalTime;
+        result.innerHTML = "you did it!";
+        boopHappyFace.classList.add("show");
+        resultTime.classList.add("show");
+        loadLeaderboard(selectedLevel.name, 'leaderboard-body', 'leaderboard');
 
-          modal.classList.add("show");
+        document.getElementById('score-entry').style.display = 'block';
+        document.getElementById('score-name').focus();
+        document.getElementById('score-difficulty').value = selectedLevel.name;
+        document.getElementById('score-time').value = finalTime;
 
-          if (!tile.classList.contains("checked")) {
-            tile.classList.add("checked");
-          }
-        }
-      });
+        modal.classList.add("show");
+      }
     }
 
     function replay() {
