@@ -44,12 +44,17 @@
     overflow: visible;
   }
 
-
   #grid-scroll-wrapper {
-    overflow: auto;
+    overflow: hidden;
     max-width: 100%;
-    max-height: 70vh;
     -webkit-overflow-scrolling: touch;
+  }
+
+  @media (max-width: 600px) {
+    #grid-scroll-wrapper {
+      overflow: auto;
+      max-height: 70vh;
+    }
   }
 
   #task-accordion {
@@ -134,6 +139,7 @@
 
   .dropdown .menu {
     background: var(--main-color);
+    z-index: 100;
     position: absolute;
     overflow: hidden;
     cursor: pointer;
@@ -152,8 +158,6 @@
   }
 
   .dropdown .menu .option:hover {
-    z-index: 100;
-    position: absolute;
     background: rgba(255, 255, 255, 0.2);
   }
 
