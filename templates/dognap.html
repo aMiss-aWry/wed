@@ -1,7 +1,7 @@
 <style>
   :root {
-    --grid-width: 350;
-    --tile-width: 35;
+    --grid-width: 350px;
+    --tile-width: 35px;
     --main-color: #8B6AF5;
     --dark-color: #5938c3;
     --body-bg: #f9f8fe;
@@ -67,15 +67,15 @@
   }
 
   .grid {
-    height: calc(var(--grid-width) * 1px);
-    width: 100%;
+    height: var(--grid-width);
+    width: var(--grid-width);
     display: flex;
     flex-wrap: wrap;
   }
 
   .tile {
-    height: calc(var(--tile-width) * 1px);
-    width: calc(var(--tile-width) * 1px);
+    height: var(--tile-width);
+    width: var(--tile-width);
     cursor: pointer;
     border: 2px solid;
     border-color: white var(--tile-border) var(--tile-border) white;
@@ -344,6 +344,12 @@
   .dognap-btn:hover {
     background: currentColor;
     color: var(--bg-color);
+  }
+
+  @media (max-width: 480px) {
+    :root {
+      --tile-width: 28px;
+    }
   }
 
   @keyframes shake {
@@ -743,13 +749,12 @@
     function createBoard() {
       loadLeaderboard(selectedLevel.name, 'leaderboard-body-permanent', 'leaderboard-permanent')
       applyPalette();
-
       flagsLeft.innerHTML = selectedLevel.boops;
       const width = selectedLevel.width;
       const tileWidth = parseInt(
         getComputedStyle(root).getPropertyValue("--tile-width")
       );
-      root.style.setProperty("--grid-width", width * tileWidth);
+      root.style.setProperty("--grid-width", (width * tileWidth) + "px");
 
       //add tiles
       for (let i = 0; i < width * width; i++) {
