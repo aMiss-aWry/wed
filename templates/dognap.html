@@ -749,6 +749,8 @@
     }
 
     function createBoard() {
+      grid.innerHTML = '';
+      tiles = [];
       loadLeaderboard(selectedLevel.name, 'leaderboard-body-permanent', 'leaderboard-permanent')
       applyPalette();
       flagsLeft.innerHTML = selectedLevel.boops;
