@@ -56,6 +56,14 @@ class Guest(db.Model):
     meal_choice  = db.Column(db.String(50), nullable=True)
 
 
+class DogsnapScore(db.Model):
+    id         = db.Column(db.Integer, primary_key=True)
+    name       = db.Column(db.String(100), nullable=False)
+    difficulty = db.Column(db.String(20), nullable=False)
+    time       = db.Column(db.Float, nullable=False)
+    scored_at  = db.Column(db.DateTime, default=datetime.utcnow)
+
+
 # ── Auth helpers ──────────────────────────────────────────────────────────────
 
 def login_required(f):
@@ -379,6 +387,35 @@ def export():
 def dognap():
     return render_template('dognap.html')
 
+@app.route('/api/scores', methods=['GET'])
+@login_required
+def get_scores():
+    difficulty = request.args.get('difficulty', 'Easy')
+    scores = DogsnapScore.query.filter_by(difficulty=difficulty)\
+             .order_by(DogsnapScore.time.asc()).limit(10).all()
+    return jsonify([{
+        'name': s.name,
+        'difficulty': s.difficulty,
+        'time': s.time,
+        'scored_at': s.scored_at.strftime('%b %d, %Y'),
+    } for s in scores])
+
+
+@app.route('/api/scores', methods=['POST'])
+@login_required
+def post_score():
+    data = request.get_json()
+    name = data.get('name', '').strip()
+    difficulty = data.get('difficulty', '').strip()
+    time = data.get('time')
+
+    if not name or not difficulty or time is None:
+        return jsonify({'error': 'Missing fields'}), 400
+
+    score = DogsnapScore(name=name, difficulty=difficulty, time=time)
+    db.session.add(score)
+    db.session.commit()
+    return jsonify({'ok': True})
 
 with app.app_context():
     db.create_all()
