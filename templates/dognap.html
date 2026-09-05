@@ -176,6 +176,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    padding: 1rem;
+    overflow-y: auto;
   }
 
   #modal.show {
@@ -196,7 +198,9 @@
     background-color: #f9f8fe;
     box-shadow: 5px 5px 20px 0 rgba(100, 74, 74, 0.1);
     border-radius: 4px;
-    min-width: min(800px, 92vw);
+    width: min(800px, 92vw);
+    max-height: 90vh;
+    overflow-y: auto;
     text-align: center;
   }
 
@@ -217,6 +221,27 @@
     border-left: 1px solid #e8e4ff;
     text-align: left;
     min-width: 0;
+  }
+
+  @media (max-width: 600px) {
+    #result-columns {
+      flex-direction: column;
+    }
+    #result-right {
+      border-left: none;
+      border-top: 1px solid #e8e4ff;
+      padding-top: 1rem;
+      width: 100%;
+    }
+    #result-left {
+      padding: 1rem;
+    }
+    svg#boop {
+      width: 120px;
+    }
+    #result-message {
+      font-size: 1.4rem;
+    }
   }
 
   #result-message {
@@ -313,6 +338,7 @@
 
   svg#boop {
     width: 200px;
+    max-width: 100%;
   }
 
   svg#boop .winning-svg {
