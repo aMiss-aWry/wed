@@ -108,7 +108,7 @@
     color: white;
     background-color: rgba(255, 255, 255, 0.2);
     border-radius: 3px;
-    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-family: 'Special Elite', serif;
     font-size: 1rem;
     text-align: center;
   }
@@ -149,7 +149,8 @@
   #flag-countdown,
   #timer {
     display: flex;
-    font-size: 35px;
+    font-size: 30px;
+    font-family: Verdana, sans-serif
   }
 
   #flag-countdown span,
@@ -239,7 +240,7 @@
     margin: 1rem;
     height: 60px;
     border-radius: 4px;
-    font-family: sans-serif;
+    font-family: 'Special Elite', serif;
   }
 
   #new-game * {
@@ -256,7 +257,7 @@
     background-color: var(--main-color);
     color: white;
     border-radius: 6px;
-    font-family: "Roboto Mono", monospace;
+    font-family: 'Special Elite', serif;
     font-size: 1.1rem;
     box-shadow: 5px 5px 20px 0 rgba(100, 74, 74, 0.1);
     position: relative;
@@ -272,7 +273,7 @@
     background: var(--main-color);
     border: none;
     color: white;
-    font-family: "Roboto Mono", monospace;
+    font-family: 'Special Elite', serif;
     font-size: 1rem;
     padding: 0.4rem 1rem;
     border-radius: 4px;
@@ -774,6 +775,7 @@
       const tileWidth = parseInt(
         getComputedStyle(root).getPropertyValue("--tile-width")
       );
+      flagsLeft.innerHTML = selectedLevel.boops - flags;
       loadLeaderboard(selectedLevel.name, 'leaderboard-body-permanent', 'leaderboard-permanent');
       applyPalette()
       root.style.setProperty("--grid-width", (width * tileWidth) + "px");
@@ -803,7 +805,7 @@
       const randomTiles = tiles
         .sort(() => Math.random() - 0.5)
         .slice(0, selectedLevel.boops)
-        .map((tile) => tile.id); // suffle tile's id and select 20 firsts to get 20 random tiles
+        .map((tile) => tile.id); // shuffle tile's id and select 20 firsts to get 20 random tiles
       randomTiles.forEach((id, i) => {
         dogImageAssignments[id] = shuffledImages[i % shuffledImages.length];
       });
