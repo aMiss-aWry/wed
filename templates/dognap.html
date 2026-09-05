@@ -209,6 +209,42 @@
     display: inline-block;
   }
 
+  #game-over-bar {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 1rem;
+    padding: 0.75rem 1.5rem;
+    background-color: var(--main-color);
+    color: white;
+    border-radius: 6px;
+    font-family: "Roboto Mono", monospace;
+    font-size: 1.1rem;
+    box-shadow: 5px 5px 20px 0 rgba(100, 74, 74, 0.1);
+    position: relative;
+    z-index: 2;
+  }
+
+  #game-over-bar.show {
+    display: flex;
+  }
+
+  #game-over-new-game {
+    cursor: pointer;
+    background: rgba(255, 255, 255, 0.25);
+    border: none;
+    color: white;
+    font-family: "Roboto Mono", monospace;
+    font-size: 1rem;
+    padding: 0.4rem 1rem;
+    border-radius: 4px;
+  }
+
+  #game-over-new-game:hover {
+    background: rgba(255, 255, 255, 0.4);
+  }
+
   #new-game h2 {
     line-height: 30px;
     margin: 0 0 0 1rem;
@@ -297,7 +333,8 @@
 </style>
 
 <body>
-  <h2 style="color: var(--main-color); font-family: 'Roboto Mono', monospace; margin-bottom: 1rem;">DON'T WAKE THE SLEEPING DOG (or other critters)!</h2>
+  <h2 style="color: var(--main-color); font-family: 'Roboto Mono', monospace; margin-bottom: 1rem;">DON'T WAKE THE
+    SLEEPING DOG (or other critters)!</h2>
   <svg id="main" class="hide">
     <symbol id="boop-svg" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 786.7 687.8" width="50px">
       <path d="M427.4,144.2l40.7-41.8a23.1,23.1,0,0,1,32.5,0l72.8,72.8a23.1,23.1,0,0,1,0,32.5l-37.4,37.4"
@@ -416,6 +453,10 @@
     </div>
     <div class="grid"></div>
   </div>
+  <div id="game-over-bar">
+    <span>You ruined naptime!</span>
+    <button id="game-over-new-game">New Game</button>
+  </div>
 
 </body>
 
@@ -450,15 +491,29 @@
         boops: 70,
       },
     ];
+    // ── Image folder path – update this if the folder moves ──────────────
+    const DOGNAP_IMAGE_PATH = "/static/images/dognap";
+    const DOG_IMAGES = [
+      "dog.png", "dog1.png", "dog2.png", "dog3.png", "dog4.png",
+      "dog5.png", "dog6.png", "dog7.png", "dog8.png", "dog9.png",
+      "dog10.png", "dog11.png", "dog12.png", "dog13.png", "dog14.png",
+      "dog15.png", "dog16.png", "dog17.png", "dog18.png"
+    ];
+    // ─────────────────────────────────────────────────────────────────────
+
     const flagIcon =
       '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="Capa_1" x="0px" y="0px" viewBox="0 0 287.987 287.987" fill="#695ca8" style="enable-background:new 0 0 287.987 287.987;" xml:space="preserve"><g><path d="M228.702,141.029c-3.114-3.754-3.114-9.193,0-12.946l33.58-40.474c2.509-3.024,3.044-7.226,1.374-10.783   c-1.671-3.557-5.246-5.828-9.176-5.828h-57.647v60.98c0,16.618-13.52,30.138-30.138,30.138h-47.093v25.86   c0,5.599,4.539,10.138,10.138,10.138h124.74c3.93,0,7.505-2.271,9.176-5.828c1.671-3.557,1.135-7.759-1.374-10.783L228.702,141.029   z"/><path d="M176.832,131.978V25.138c0-5.599-4.539-10.138-10.138-10.138H53.37c0-8.284-6.716-15-15-15s-15,6.716-15,15   c0,7.827,0,253.91,0,257.987c0,8.284,6.716,15,15,15s15-6.716,15-15c0-6.943,0-126.106,0-130.871h113.324   C172.293,142.116,176.832,137.577,176.832,131.978z"/></g></svg>';
-    const boopIcon =
-      '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" viewBox="0 0 512 512" fill="#695ca8" ><g><path d="m411.313,123.313c6.25-6.25 6.25-16.375 0-22.625s-16.375-6.25-22.625,0l-32,32-9.375,9.375-20.688-20.688c-12.484-12.5-32.766-12.5-45.25,0l-16,16c-1.261,1.261-2.304,2.648-3.31,4.051-21.739-8.561-45.324-13.426-70.065-13.426-105.867,0-192,86.133-192,192s86.133,192 192,192 192-86.133 192-192c0-24.741-4.864-48.327-13.426-70.065 1.402-1.007 2.79-2.049 4.051-3.31l16-16c12.5-12.492 12.5-32.758 0-45.25l-20.688-20.688 9.375-9.375 32.001-31.999zm-219.313,100.687c-52.938,0-96,43.063-96,96 0,8.836-7.164,16-16,16s-16-7.164-16-16c0-70.578 57.422-128 128-128 8.836,0 16,7.164 16,16s-7.164,16-16,16z"/><path d="m459.02,148.98c-6.25-6.25-16.375-6.25-22.625,0s-6.25,16.375 0,22.625l16,16c3.125,3.125 7.219,4.688 11.313,4.688 4.094,0 8.188-1.563 11.313-4.688 6.25-6.25 6.25-16.375 0-22.625l-16.001-16z"/><path d="m340.395,75.605c3.125,3.125 7.219,4.688 11.313,4.688 4.094,0 8.188-1.563 11.313-4.688 6.25-6.25 6.25-16.375 0-22.625l-16-16c-6.25-6.25-16.375-6.25-22.625,0s-6.25,16.375 0,22.625l15.999,16z"/><path d="m400,64c8.844,0 16-7.164 16-16v-32c0-8.836-7.156-16-16-16-8.844,0-16,7.164-16,16v32c0,8.836 7.156,16 16,16z"/><path d="m496,96.586h-32c-8.844,0-16,7.164-16,16 0,8.836 7.156,16 16,16h32c8.844,0 16-7.164 16-16 0-8.836-7.156-16-16-16z"/><path d="m436.98,75.605c3.125,3.125 7.219,4.688 11.313,4.688 4.094,0 8.188-1.563 11.313-4.688l32-32c6.25-6.25 6.25-16.375 0-22.625s-16.375-6.25-22.625,0l-32,32c-6.251,6.25-6.251,16.375-0.001,22.625z"/></g></svg>';
+    // Returns an img tag for the dog assigned to a given tile index
+    function getDogIcon(tileIndex) {
+      const img = dogImageAssignments[tileIndex];
+      return `<img src="${DOGNAP_IMAGE_PATH}/${img}" style="width:90%;height:90%;object-fit:contain;" />`;
+    }
 
     let root = document.documentElement;
     let selectedLevel = levels[0];
     let flags = 0;
     let tiles = [];
+    let dogImageAssignments = {};
     let isGameOver = false;
     let isTimerOn = false;
     let timerCount = 0;
@@ -511,6 +566,7 @@
       boopHappyFace.classList.remove("show");
       boopSadFace.classList.remove("show");
       resultTime.classList.remove("show");
+      document.getElementById("game-over-bar").classList.remove("show");
       createBoard();
     }
 
@@ -547,10 +603,16 @@
       }
 
       //add boops
+      // Assign a dog image to every tile slot (cycling/repeating through shuffled images)
+      const shuffledImages = [...DOG_IMAGES].sort(() => Math.random() - 0.5);
+      dogImageAssignments = {};
       const randomTiles = tiles
         .sort(() => Math.random() - 0.5)
         .slice(0, selectedLevel.boops)
         .map((tile) => tile.id); // suffle tile's id and select 20 firsts to get 20 random tiles
+      randomTiles.forEach((id, i) => {
+        dogImageAssignments[id] = shuffledImages[i % shuffledImages.length];
+      });
       tiles.forEach((tile) =>
         randomTiles.includes(tile.id)
           ? tile.classList.add("has-boop")
@@ -665,7 +727,7 @@
     function gameOver(currentTile) {
       isGameOver = true;
       stopTimer();
-      currentTile.innerHTML = boopIcon;
+      currentTile.innerHTML = getDogIcon(currentTile.id);
       container.classList.add("shake");
       currentTile.style.backgroundColor =
         bgColors[Math.floor(Math.random() * bgColors.length)];
@@ -679,7 +741,7 @@
       );
       boopTiles.forEach((tile, index) => {
         setTimeout(() => {
-          tile.innerHTML = boopIcon;
+          tile.innerHTML = getDogIcon(tile.id);
           tile.style.backgroundColor =
             bgColors[Math.floor(Math.random() * bgColors.length)];
           tile.classList.remove("has-boop");
@@ -687,9 +749,7 @@
           itemsProcessed++;
           if (itemsProcessed === boopTiles.length) {
             setTimeout(() => {
-              modal.classList.add("show");
-              boopSadFace.classList.add("show");
-              result.innerHTML = "Game Over!";
+              document.getElementById("game-over-bar").classList.add("show");
             }, 1000);
           }
         }, 10 * index);
@@ -747,6 +807,7 @@
     }
 
     document.querySelector("#new-game").addEventListener("click", replay);
+    document.getElementById("game-over-new-game").addEventListener("click", replay);
 
     // timer functions
     function startTimer() {
